@@ -35,7 +35,7 @@ export default function LoginForm() {
         err.response?.data?.message ||
         (err instanceof Error ? err.message : "Login failed");
       setError(errorMessage);
-      
+
       toast({
         title: "Login failed",
         description: errorMessage,

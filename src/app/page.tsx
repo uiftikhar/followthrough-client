@@ -13,7 +13,7 @@ export default function Home() {
   // Only redirect authenticated users to dashboard when they visit the homepage directly
   // This prevents redirects from occurring when users manually navigate to other pages
   useEffect(() => {
-    if (isAuthenticated && window.location.pathname === '/') {
+    if (isAuthenticated && window.location.pathname === "/") {
       router.push("/dashboard");
     }
   }, [isAuthenticated, router]);

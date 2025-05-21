@@ -15,11 +15,11 @@ export function AuthCheck() {
   const [synced, setSynced] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
-  
+
   // Public routes that don't require authentication
-  const publicRoutes = ['/', '/auth/login', '/auth/register'];
+  const publicRoutes = ["/", "/auth/login", "/auth/register"];
   const isPublicRoute = publicRoutes.includes(pathname);
-  const isAuthPage = ['/auth/login', '/auth/register'].includes(pathname);
+  const isAuthPage = ["/auth/login", "/auth/register"].includes(pathname);
 
   useEffect(() => {
     const syncAuth = () => {
@@ -30,7 +30,7 @@ export function AuthCheck() {
         const cookieToken = Cookies.get("auth_token");
 
         // Only log in development
-        if (process.env.NODE_ENV === 'development') {
+        if (process.env.NODE_ENV === "development") {
           console.log("Auth Check - Local Storage Token:", !!localToken);
           console.log("Auth Check - Cookie Token:", !!cookieToken);
         }
@@ -44,16 +44,19 @@ export function AuthCheck() {
           // Verify sync was successful
           setTimeout(() => {
             const cookieToken = Cookies.get("auth_token");
-            if (process.env.NODE_ENV === 'development') {
-              console.log("Auth Check - Cookie Token after sync:", !!cookieToken);
+            if (process.env.NODE_ENV === "development") {
+              console.log(
+                "Auth Check - Cookie Token after sync:",
+                !!cookieToken,
+              );
             }
             setSynced(!!cookieToken);
           }, 100);
         }
-        
+
         // If on login/register page and authenticated, redirect to dashboard
         if (isAuthPage) {
-          router.push('/dashboard');
+          router.push("/dashboard");
         }
       } else {
         // If not authenticated but trying to access protected route, redirect to login
@@ -72,7 +75,7 @@ export function AuthCheck() {
     const interval = setInterval(() => {
       const localToken = localStorage.getItem("auth_token");
       const cookieToken = Cookies.get("auth_token");
-      
+
       // If there's a mismatch, try to sync
       if ((localToken && !cookieToken) || (!localToken && cookieToken)) {
         if (localToken) {
@@ -83,7 +86,7 @@ export function AuthCheck() {
         }
       }
     }, 30000); // Check every 30 seconds
-    
+
     return () => clearInterval(interval);
   }, []);
 
