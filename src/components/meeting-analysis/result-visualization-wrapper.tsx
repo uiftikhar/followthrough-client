@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 import {
   MeetingAnalysisService,
   MeetingAnalysisResponse,
-} from '@/lib/api/meeting-analysis-service';
-import { ResultVisualization } from './result-visualization';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+} from "@/lib/api/meeting-analysis-service";
+import { ResultVisualization } from "./result-visualization";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 interface ResultVisualizationWrapperProps {
   initialData: MeetingAnalysisResponse;
@@ -21,19 +21,21 @@ export function ResultVisualizationWrapper({
   initialData,
   sessionId,
 }: ResultVisualizationWrapperProps) {
-  const [analysisData, setAnalysisData] = useState<MeetingAnalysisResponse>(initialData);
+  const [analysisData, setAnalysisData] =
+    useState<MeetingAnalysisResponse>(initialData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { isAuthenticated } = useAuth();
 
   // Check if we need to refresh data (if status is not completed or failed)
-  const needsRefresh = initialData.status === 'pending' || initialData.status === 'in_progress';
+  const needsRefresh =
+    initialData.status === "pending" || initialData.status === "in_progress";
 
   // Handle manual refresh
   const handleRefresh = useCallback(async () => {
     if (!isAuthenticated) {
-      setError('You must be logged in to refresh the data');
+      setError("You must be logged in to refresh the data");
       return;
     }
 
@@ -44,12 +46,16 @@ export function ResultVisualizationWrapper({
       const data = await MeetingAnalysisService.getAnalysisResults(sessionId);
       setAnalysisData(data);
     } catch (error: any) {
-      console.error('Failed to refresh data:', error);
-      setError(error?.response?.data?.message || error?.message || 'Failed to refresh data');
+      console.error("Failed to refresh data:", error);
+      setError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to refresh data",
+      );
 
       // Handle auth errors
       if (error?.response?.status === 401) {
-        setError('Your session has expired. Please log in again.');
+        setError("Your session has expired. Please log in again.");
       }
     } finally {
       setLoading(false);
@@ -75,27 +81,38 @@ export function ResultVisualizationWrapper({
 
   return (
     <div>
-      <div className='mb-6 flex items-center justify-between'>
-        <h1 className='text-3xl font-bold'>Meeting Analysis Results</h1>
-        <div className='flex gap-2'>
-          <Button variant='outline' onClick={handleRefresh} disabled={loading || !isAuthenticated}>
-            {loading ? 'Refreshing...' : 'Refresh'}
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Meeting Analysis Results</h1>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleRefresh}
+            disabled={loading || !isAuthenticated}
+          >
+            {loading ? "Refreshing..." : "Refresh"}
           </Button>
-          <Button variant='outline' onClick={() => router.push('/meeting-analysis')}>
+          <Button
+            variant="outline"
+            onClick={() => router.push("/meeting-analysis")}
+          >
             New Analysis
           </Button>
         </div>
       </div>
 
       {error && (
-        <Alert variant='destructive' className='mb-4'>
-          <AlertCircle className='h-4 w-4' />
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <ResultVisualization data={analysisData} isLoading={loading} onRefresh={handleRefresh} />
+      <ResultVisualization
+        data={analysisData}
+        isLoading={loading}
+        onRefresh={handleRefresh}
+      />
     </div>
   );
 }

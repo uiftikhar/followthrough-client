@@ -1,10 +1,14 @@
-import { useState, useEffect } from 'react';
-import { HealthService, HealthStatus } from '../lib/api/health-service';
+import { useState, useEffect } from "react";
+import { HealthService, HealthStatus } from "../lib/api/health-service";
 
 /**
  * Connection status for the server
  */
-export type ConnectionStatus = 'connected' | 'disconnected' | 'degraded' | 'loading';
+export type ConnectionStatus =
+  | "connected"
+  | "disconnected"
+  | "degraded"
+  | "loading";
 
 /**
  * Options for the useConnectionStatus hook
@@ -30,7 +34,7 @@ export function useConnectionStatus(options: UseConnectionStatusOptions = {}): {
   checkNow: () => Promise<void>;
   details: HealthStatus | null;
 } {
-  const [status, setStatus] = useState<ConnectionStatus>('loading');
+  const [status, setStatus] = useState<ConnectionStatus>("loading");
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
   const [details, setDetails] = useState<HealthStatus | null>(null);
 
@@ -45,16 +49,16 @@ export function useConnectionStatus(options: UseConnectionStatusOptions = {}): {
       setLastChecked(new Date());
       setDetails(healthStatus);
 
-      if (healthStatus.status === 'OK') {
-        setStatus('connected');
-      } else if (healthStatus.status === 'DEGRADED') {
-        setStatus('degraded');
+      if (healthStatus.status === "OK") {
+        setStatus("connected");
+      } else if (healthStatus.status === "DEGRADED") {
+        setStatus("degraded");
       } else {
-        setStatus('disconnected');
+        setStatus("disconnected");
       }
     } catch (error) {
-      console.error('Failed to check connection status:', error);
-      setStatus('disconnected');
+      console.error("Failed to check connection status:", error);
+      setStatus("disconnected");
       setLastChecked(new Date());
     }
   };

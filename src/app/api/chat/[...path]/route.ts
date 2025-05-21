@@ -1,12 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
-const API_URL = process.env.API_URL || 'http://localhost:3001';
+const API_URL = process.env.API_URL || "http://localhost:3001";
 
 /**
  * API route handler for forwarding chat requests to the server
  */
-export async function GET(request: NextRequest, { params }: { params: { path: string[] } }) {
-  const path = params.path.join('/');
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { path: string[] } },
+) {
+  const path = params.path.join("/");
   const { searchParams } = new URL(request.url);
 
   // Construct the URL with query parameters
@@ -19,10 +22,10 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
     // Forward the request to the server
     const response = await fetch(url, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...Object.fromEntries(request.headers),
       },
-      credentials: 'include',
+      credentials: "include",
     });
 
     // Get the response data
@@ -33,16 +36,22 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
       status: response.status,
     });
   } catch (error) {
-    console.error('Error forwarding request to server:', error);
-    return NextResponse.json({ error: 'Failed to communicate with the server' }, { status: 500 });
+    console.error("Error forwarding request to server:", error);
+    return NextResponse.json(
+      { error: "Failed to communicate with the server" },
+      { status: 500 },
+    );
   }
 }
 
 /**
  * API route handler for forwarding POST requests to the server
  */
-export async function POST(request: NextRequest, { params }: { params: { path: string[] } }) {
-  const path = params.path.join('/');
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { path: string[] } },
+) {
+  const path = params.path.join("/");
 
   try {
     // Get the request body
@@ -50,13 +59,13 @@ export async function POST(request: NextRequest, { params }: { params: { path: s
 
     // Forward the request to the server
     const response = await fetch(`${API_URL}/api/chat/${path}`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...Object.fromEntries(request.headers),
       },
       body: JSON.stringify(body),
-      credentials: 'include',
+      credentials: "include",
     });
 
     // Get the response data
@@ -67,7 +76,10 @@ export async function POST(request: NextRequest, { params }: { params: { path: s
       status: response.status,
     });
   } catch (error) {
-    console.error('Error forwarding request to server:', error);
-    return NextResponse.json({ error: 'Failed to communicate with the server' }, { status: 500 });
+    console.error("Error forwarding request to server:", error);
+    return NextResponse.json(
+      { error: "Failed to communicate with the server" },
+      { status: 500 },
+    );
   }
 }

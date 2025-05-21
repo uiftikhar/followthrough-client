@@ -82,7 +82,7 @@ export interface AnalysisError {
 // Base Analysis Result structure
 export interface AnalysisResult {
   sessionId: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  status: "pending" | "in_progress" | "completed" | "failed";
   topics?: Topic[];
   actionItems?: ActionItem[];
   sentiment?: SentimentAnalysis;

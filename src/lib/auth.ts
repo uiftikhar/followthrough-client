@@ -1,17 +1,17 @@
-import { NextAuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import axios from 'axios';
+import { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import axios from "axios";
 
 // API URL for auth endpoints
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: 'Credentials',
+      name: "Credentials",
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -29,9 +29,9 @@ export const authOptions: NextAuthOptions = {
             {
               withCredentials: true,
               headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
-            }
+            },
           );
 
           // Return the user object if successful
@@ -45,16 +45,16 @@ export const authOptions: NextAuthOptions = {
 
           return null;
         } catch (error) {
-          console.error('Authentication error:', error);
+          console.error("Authentication error:", error);
           return null;
         }
       },
     }),
   ],
   pages: {
-    signIn: '/auth/login',
-    signOut: '/auth/logout',
-    error: '/auth/error',
+    signIn: "/auth/login",
+    signOut: "/auth/logout",
+    error: "/auth/error",
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -77,8 +77,8 @@ export const authOptions: NextAuthOptions = {
     },
   },
   session: {
-    strategy: 'jwt',
+    strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  secret: process.env.NEXTAUTH_SECRET || 'your-secret-key',
+  secret: process.env.NEXTAUTH_SECRET || "your-secret-key",
 };

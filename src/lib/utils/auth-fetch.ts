@@ -4,8 +4,8 @@
  * Wraps the fetch API with authentication headers and implements
  * retry logic with exponential backoff
  */
-import { API_CONFIG } from '../../config/api';
-import { AuthService } from '../auth/auth.service';
+import { API_CONFIG } from "../../config/api";
+import { AuthService } from "../auth/auth.service";
 
 interface RetryOptions {
   maxRetries?: number;
@@ -16,7 +16,7 @@ interface RetryOptions {
 export async function fetchWithAuth(
   url: string,
   options: RequestInit = {},
-  retryOptions: RetryOptions = {}
+  retryOptions: RetryOptions = {},
 ): Promise<Response> {
   // Get the auth token from the AuthService
   const token = AuthService.getToken();
@@ -52,10 +52,10 @@ export async function fetchWithAuth(
           console.warn(`Authentication failed for ${url}, retrying...`);
 
           // For our mock system, we can't refresh tokens, so we'll just add bypass header
-          headers['x-bypass-auth'] = '1';
+          headers["x-bypass-auth"] = "1";
 
           // Wait before retry using exponential backoff
-          await new Promise(resolve => setTimeout(resolve, backoff));
+          await new Promise((resolve) => setTimeout(resolve, backoff));
           backoff = Math.min(backoff * 2, maxBackoff);
           retries++;
           continue;
@@ -65,7 +65,7 @@ export async function fetchWithAuth(
       // For server errors, implement retry
       if (response.status >= 500 && retries < maxRetries) {
         console.warn(`Server error ${response.status} for ${url}, retrying...`);
-        await new Promise(resolve => setTimeout(resolve, backoff));
+        await new Promise((resolve) => setTimeout(resolve, backoff));
         backoff = Math.min(backoff * 2, maxBackoff);
         retries++;
         continue;
@@ -79,11 +79,14 @@ export async function fetchWithAuth(
         console.warn(`Network error fetching ${url}:`, error);
         console.warn(`Retrying (${retries + 1}/${maxRetries})...`);
 
-        await new Promise(resolve => setTimeout(resolve, backoff));
+        await new Promise((resolve) => setTimeout(resolve, backoff));
         backoff = Math.min(backoff * 2, maxBackoff);
         retries++;
       } else {
-        console.error(`Failed to fetch ${url} after ${maxRetries} retries:`, error);
+        console.error(
+          `Failed to fetch ${url} after ${maxRetries} retries:`,
+          error,
+        );
         throw error;
       }
     }

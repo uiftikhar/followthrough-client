@@ -3,10 +3,10 @@
  */
 
 export enum TranscriptStatus {
-  UPLOADED = 'UPLOADED',
-  PROCESSING = 'PROCESSING',
-  ANALYZED = 'ANALYZED',
-  ERROR = 'ERROR',
+  UPLOADED = "UPLOADED",
+  PROCESSING = "PROCESSING",
+  ANALYZED = "ANALYZED",
+  ERROR = "ERROR",
 }
 
 export interface Transcript {
@@ -63,7 +63,7 @@ export interface KnowledgeGapAnalysis {
 export interface KnowledgeGap {
   topic: string;
   description: string;
-  severity: 'low' | 'medium' | 'high';
+  severity: "low" | "medium" | "high";
   recommendedAction?: string;
 }
 

@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { transcriptApi } from '@/lib/api/transcript';
-import { Transcript } from '@/types/transcript';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { transcriptApi } from "@/lib/api/transcript";
+import { Transcript } from "@/types/transcript";
 
 // Query keys
-const TRANSCRIPTS_KEY = 'transcripts';
-const TRANSCRIPT_DETAIL_KEY = 'transcript-detail';
-const SEARCH_TRANSCRIPTS_KEY = 'search-transcripts';
+const TRANSCRIPTS_KEY = "transcripts";
+const TRANSCRIPT_DETAIL_KEY = "transcript-detail";
+const SEARCH_TRANSCRIPTS_KEY = "search-transcripts";
 
 /**
  * Hook to fetch all transcripts for the current user
@@ -48,8 +48,13 @@ export function useUploadTranscript() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ file, metadata }: { file: File; metadata?: Record<string, any> }) =>
-      transcriptApi.uploadTranscript(file, metadata),
+    mutationFn: ({
+      file,
+      metadata,
+    }: {
+      file: File;
+      metadata?: Record<string, any>;
+    }) => transcriptApi.uploadTranscript(file, metadata),
     onSuccess: () => {
       // Invalidate the transcripts query to refetch the list
       queryClient.invalidateQueries({ queryKey: [TRANSCRIPTS_KEY] });
@@ -66,9 +71,12 @@ export function useUpdateTranscript() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Transcript> }) =>
       transcriptApi.updateTranscript(id, data),
-    onSuccess: updatedTranscript => {
+    onSuccess: (updatedTranscript) => {
       // Update the cache for this specific transcript
-      queryClient.setQueryData([TRANSCRIPT_DETAIL_KEY, updatedTranscript.id], updatedTranscript);
+      queryClient.setQueryData(
+        [TRANSCRIPT_DETAIL_KEY, updatedTranscript.id],
+        updatedTranscript,
+      );
 
       // Also invalidate the main list
       queryClient.invalidateQueries({ queryKey: [TRANSCRIPTS_KEY] });
@@ -86,10 +94,13 @@ export function useDeleteTranscript() {
     mutationFn: (id: string) => transcriptApi.deleteTranscript(id),
     onSuccess: (_, id) => {
       // Remove the transcript from the transcripts cache
-      queryClient.setQueryData([TRANSCRIPTS_KEY], (oldData: Transcript[] | undefined) => {
-        if (!oldData) return [];
-        return oldData.filter(transcript => transcript.id !== id);
-      });
+      queryClient.setQueryData(
+        [TRANSCRIPTS_KEY],
+        (oldData: Transcript[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.filter((transcript) => transcript.id !== id);
+        },
+      );
 
       // Remove the specific transcript detail from cache
       queryClient.removeQueries({ queryKey: [TRANSCRIPT_DETAIL_KEY, id] });
@@ -105,9 +116,12 @@ export function useAnalyzeTranscript() {
 
   return useMutation({
     mutationFn: (id: string) => transcriptApi.analyzeTranscript(id),
-    onSuccess: updatedTranscript => {
+    onSuccess: (updatedTranscript) => {
       // Update the cache for this specific transcript
-      queryClient.setQueryData([TRANSCRIPT_DETAIL_KEY, updatedTranscript.id], updatedTranscript);
+      queryClient.setQueryData(
+        [TRANSCRIPT_DETAIL_KEY, updatedTranscript.id],
+        updatedTranscript,
+      );
 
       // Also invalidate the main list
       queryClient.invalidateQueries({ queryKey: [TRANSCRIPTS_KEY] });

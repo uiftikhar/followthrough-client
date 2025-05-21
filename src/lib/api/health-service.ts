@@ -3,14 +3,14 @@
  *
  * Provides methods to check system health and service status
  */
-import { fetchWithAuth } from '../utils/auth-fetch';
-import { API_CONFIG } from '../../config/api';
+import { fetchWithAuth } from "../utils/auth-fetch";
+import { API_CONFIG } from "../../config/api";
 
 /**
  * Basic health response
  */
 export interface HealthStatus {
-  status: 'OK' | 'DEGRADED' | 'ERROR';
+  status: "OK" | "DEGRADED" | "ERROR";
   timestamp?: string;
 }
 
@@ -24,7 +24,7 @@ export interface DetailedHealthStatus extends HealthStatus {
   cpu: Record<string, number>;
   services?: {
     name: string;
-    status: 'OK' | 'DEGRADED' | 'ERROR';
+    status: "OK" | "DEGRADED" | "ERROR";
     message?: string;
   }[];
 }
@@ -33,10 +33,10 @@ export interface DetailedHealthStatus extends HealthStatus {
  * Service status response
  */
 export interface ServiceStatusResponse {
-  status: 'OK' | 'DEGRADED' | 'ERROR';
+  status: "OK" | "DEGRADED" | "ERROR";
   services: {
     name: string;
-    status: 'OK' | 'DEGRADED' | 'ERROR';
+    status: "OK" | "DEGRADED" | "ERROR";
     details?: Record<string, any>;
   }[];
 }
@@ -51,17 +51,17 @@ export const HealthService = {
   async checkHealth(): Promise<HealthStatus> {
     try {
       const response = await fetchWithAuth(
-        `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.health.base}`
+        `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.health.base}`,
       );
 
       if (!response.ok) {
-        return { status: 'ERROR' };
+        return { status: "ERROR" };
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Health check failed:', error);
-      return { status: 'ERROR' };
+      console.error("Health check failed:", error);
+      return { status: "ERROR" };
     }
   },
 
@@ -71,14 +71,14 @@ export const HealthService = {
   async checkDetailedHealth(): Promise<DetailedHealthStatus> {
     try {
       const response = await fetchWithAuth(
-        `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.health.detailed}`
+        `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.health.detailed}`,
       );
 
       if (!response.ok) {
         return {
-          status: 'ERROR',
+          status: "ERROR",
           uptime: 0,
-          env: 'unknown',
+          env: "unknown",
           memory: {},
           cpu: {},
         };
@@ -86,11 +86,11 @@ export const HealthService = {
 
       return await response.json();
     } catch (error) {
-      console.error('Detailed health check failed:', error);
+      console.error("Detailed health check failed:", error);
       return {
-        status: 'ERROR',
+        status: "ERROR",
         uptime: 0,
-        env: 'unknown',
+        env: "unknown",
         memory: {},
         cpu: {},
       };
@@ -103,21 +103,21 @@ export const HealthService = {
   async checkServiceStatus(): Promise<ServiceStatusResponse> {
     try {
       const response = await fetchWithAuth(
-        `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.health.serviceStatus}`
+        `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.health.serviceStatus}`,
       );
 
       if (!response.ok) {
         return {
-          status: 'ERROR',
+          status: "ERROR",
           services: [],
         };
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Service status check failed:', error);
+      console.error("Service status check failed:", error);
       return {
-        status: 'ERROR',
+        status: "ERROR",
         services: [],
       };
     }

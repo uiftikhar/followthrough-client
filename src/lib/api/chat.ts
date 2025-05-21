@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export interface ChatSession {
   id: string;
@@ -11,7 +11,7 @@ export interface ChatSession {
 export interface ChatMessage {
   id: string;
   content: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   timestamp: number;
   attachments?: Array<{
     type: string;
@@ -23,7 +23,7 @@ export interface ChatMessage {
 export interface ChatResponse {
   id: string;
   content: string;
-  type: 'text' | 'visualization' | 'error' | 'loading' | 'analysis' | 'action';
+  type: "text" | "visualization" | "error" | "loading" | "analysis" | "action";
   timestamp: number;
   attachments?: Array<{
     type: string;
@@ -39,13 +39,13 @@ export interface ChatResponse {
 
 export interface TranscriptUploadResponse {
   meetingId: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  status: "pending" | "in_progress" | "completed" | "failed";
   timestamp: number;
 }
 
 export interface AnalysisStatusResponse {
   meetingId: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  status: "pending" | "in_progress" | "completed" | "failed";
   progress: {
     overallProgress: number;
     started: number;
@@ -60,11 +60,14 @@ export const chatApi = {
   /**
    * Create a new chat session
    */
-  async createSession(userId: string, metadata?: Record<string, any>): Promise<ChatSession> {
+  async createSession(
+    userId: string,
+    metadata?: Record<string, any>,
+  ): Promise<ChatSession> {
     const response = await axios.post(
       `${API_URL}/api/chat/session`,
       { userId, metadata },
-      { withCredentials: true }
+      { withCredentials: true },
     );
     return response.data;
   },
@@ -73,9 +76,12 @@ export const chatApi = {
    * Get chat session details
    */
   async getSession(sessionId: string): Promise<ChatSession> {
-    const response = await axios.get(`${API_URL}/api/chat/session/${sessionId}`, {
-      withCredentials: true,
-    });
+    const response = await axios.get(
+      `${API_URL}/api/chat/session/${sessionId}`,
+      {
+        withCredentials: true,
+      },
+    );
     return response.data;
   },
 
@@ -85,12 +91,12 @@ export const chatApi = {
   async sendMessage(
     sessionId: string,
     content: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, any>,
   ): Promise<ChatResponse> {
     const response = await axios.post(
       `${API_URL}/api/chat/message`,
       { sessionId, content, metadata },
-      { withCredentials: true }
+      { withCredentials: true },
     );
     return response.data;
   },
@@ -98,11 +104,17 @@ export const chatApi = {
   /**
    * Get message history for a session
    */
-  async getMessageHistory(sessionId: string, limit?: number): Promise<ChatMessage[]> {
-    const response = await axios.get(`${API_URL}/api/chat/history/${sessionId}`, {
-      params: { limit },
-      withCredentials: true,
-    });
+  async getMessageHistory(
+    sessionId: string,
+    limit?: number,
+  ): Promise<ChatMessage[]> {
+    const response = await axios.get(
+      `${API_URL}/api/chat/history/${sessionId}`,
+      {
+        params: { limit },
+        withCredentials: true,
+      },
+    );
     return response.data;
   },
 
@@ -113,12 +125,12 @@ export const chatApi = {
     transcript: string,
     title?: string,
     description?: string,
-    participants?: Array<{ id: string; name: string; role?: string }>
+    participants?: Array<{ id: string; name: string; role?: string }>,
   ): Promise<TranscriptUploadResponse> {
     const response = await axios.post(
       `${API_URL}/api/chat/transcript/upload`,
       { transcript, title, description, participants },
-      { withCredentials: true }
+      { withCredentials: true },
     );
     return response.data;
   },
@@ -129,12 +141,12 @@ export const chatApi = {
   async analyzeTranscript(
     meetingId: string,
     goals?: string[],
-    options?: Record<string, any>
+    options?: Record<string, any>,
   ): Promise<AnalysisStatusResponse> {
     const response = await axios.post(
       `${API_URL}/api/chat/transcript/${meetingId}/analyze`,
       { goals, options },
-      { withCredentials: true }
+      { withCredentials: true },
     );
     return response.data;
   },
@@ -143,9 +155,12 @@ export const chatApi = {
    * Get analysis status
    */
   async getAnalysisStatus(meetingId: string): Promise<AnalysisStatusResponse> {
-    const response = await axios.get(`${API_URL}/api/chat/transcript/${meetingId}/status`, {
-      withCredentials: true,
-    });
+    const response = await axios.get(
+      `${API_URL}/api/chat/transcript/${meetingId}/status`,
+      {
+        withCredentials: true,
+      },
+    );
     return response.data;
   },
 
@@ -153,9 +168,12 @@ export const chatApi = {
    * Get related meetings
    */
   async getRelatedMeetings(meetingId: string): Promise<any[]> {
-    const response = await axios.get(`${API_URL}/api/chat/transcript/${meetingId}/related`, {
-      withCredentials: true,
-    });
+    const response = await axios.get(
+      `${API_URL}/api/chat/transcript/${meetingId}/related`,
+      {
+        withCredentials: true,
+      },
+    );
     return response.data;
   },
 };

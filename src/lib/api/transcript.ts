@@ -1,7 +1,7 @@
-import axios from 'axios';
-import { Transcript } from '@/types/transcript';
+import axios from "axios";
+import { Transcript } from "@/types/transcript";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 /**
  * API service for transcript operations
@@ -30,21 +30,28 @@ export const transcriptApi = {
   /**
    * Upload a new transcript file
    */
-  async uploadTranscript(file: File, metadata?: Record<string, any>): Promise<Transcript> {
+  async uploadTranscript(
+    file: File,
+    metadata?: Record<string, any>,
+  ): Promise<Transcript> {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
 
     // Add metadata if provided
     if (metadata) {
-      formData.append('metadata', JSON.stringify(metadata));
+      formData.append("metadata", JSON.stringify(metadata));
     }
 
-    const response = await axios.post(`${API_URL}/api/transcripts/upload`, formData, {
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'multipart/form-data',
+    const response = await axios.post(
+      `${API_URL}/api/transcripts/upload`,
+      formData,
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       },
-    });
+    );
 
     return response.data;
   },
@@ -52,7 +59,10 @@ export const transcriptApi = {
   /**
    * Update transcript metadata or content
    */
-  async updateTranscript(id: string, data: Partial<Transcript>): Promise<Transcript> {
+  async updateTranscript(
+    id: string,
+    data: Partial<Transcript>,
+  ): Promise<Transcript> {
     const response = await axios.put(`${API_URL}/api/transcripts/${id}`, data, {
       withCredentials: true,
     });
@@ -77,7 +87,7 @@ export const transcriptApi = {
       {},
       {
         withCredentials: true,
-      }
+      },
     );
     return response.data;
   },

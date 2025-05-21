@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { AuthService } from '../lib/api/auth-service';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { AuthService } from "../lib/api/auth-service";
 
 // User type
 interface User {
@@ -39,31 +39,31 @@ interface AuthProviderProps {
  */
 function parseJwt(token: string): User | null {
   try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
     const jsonPayload = decodeURIComponent(
       atob(base64)
-        .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join(""),
     );
 
     const payload = JSON.parse(jsonPayload);
 
     // Basic validation of expected fields
     if (!payload.sub && !payload.id && !payload.email) {
-      console.error('Invalid token payload:', payload);
+      console.error("Invalid token payload:", payload);
       return null;
     }
 
     return {
       id: payload.sub || payload.id,
       email: payload.email,
-      firstName: payload.firstName || payload.given_name || '',
-      lastName: payload.lastName || payload.family_name || '',
+      firstName: payload.firstName || payload.given_name || "",
+      lastName: payload.lastName || payload.family_name || "",
     };
   } catch (error) {
-    console.error('Error parsing JWT token:', error);
+    console.error("Error parsing JWT token:", error);
     return null;
   }
 }
@@ -80,13 +80,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsLoading(true);
       try {
         const token = AuthService.getToken();
-        console.log('Auth Context - Initial token exists:', !!token);
+        console.log("Auth Context - Initial token exists:", !!token);
         if (token) {
           setUser(parseJwt(token));
           setIsAuthenticated(true);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        console.error("Error initializing auth:", error);
         setIsAuthenticated(false);
         setUser(null);
       } finally {
@@ -113,10 +113,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(userInfo);
       setIsAuthenticated(true);
 
-      console.log('Login successful, token stored in both localStorage and cookies');
+      console.log(
+        "Login successful, token stored in both localStorage and cookies",
+      );
       return response;
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
       setIsAuthenticated(false);
       setUser(null);
       throw error;
@@ -130,7 +132,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await AuthService.logout();
     } catch (error) {
-      console.error('Error during logout:', error);
+      console.error("Error during logout:", error);
     } finally {
       setUser(null);
     }

@@ -3,14 +3,14 @@
  *
  * Handles authentication functionality, including login, logout, and token management
  */
-import { API_CONFIG } from '../../config/api';
+import { API_CONFIG } from "../../config/api";
 
 // Default user credentials
 const DEFAULT_USER = {
-  email: 'abc@gmail.com',
-  password: 'temp123456',
-  name: 'Default User',
-  role: 'admin',
+  email: "abc@gmail.com",
+  password: "temp123456",
+  name: "Default User",
+  role: "admin",
 };
 
 /**
@@ -51,21 +51,21 @@ export const AuthService = {
       const token = this.generateMockToken();
 
       // Store in localStorage
-      localStorage.setItem('authToken', token);
+      localStorage.setItem("authToken", token);
       localStorage.setItem(
-        'user',
+        "user",
         JSON.stringify({
-          id: 'user-1',
+          id: "user-1",
           email: DEFAULT_USER.email,
           name: DEFAULT_USER.name,
           role: DEFAULT_USER.role,
-        })
+        }),
       );
 
       return {
         token,
         user: {
-          id: 'user-1',
+          id: "user-1",
           email: DEFAULT_USER.email,
           name: DEFAULT_USER.name,
           role: DEFAULT_USER.role,
@@ -73,29 +73,34 @@ export const AuthService = {
       };
     }
 
-    throw new Error('Invalid credentials');
+    throw new Error("Invalid credentials");
   },
 
   /**
    * Logout user
    */
   logout(): void {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
   },
 
   /**
    * Check if user is authenticated
    */
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('authToken');
+    return !!localStorage.getItem("authToken");
   },
 
   /**
    * Get current user
    */
-  getCurrentUser(): { id: string; email: string; name: string; role: string } | null {
-    const userJson = localStorage.getItem('user');
+  getCurrentUser(): {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+  } | null {
+    const userJson = localStorage.getItem("user");
     if (!userJson) return null;
 
     try {
@@ -109,7 +114,7 @@ export const AuthService = {
    * Get auth token
    */
   getToken(): string | null {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem("authToken");
   },
 
   /**
@@ -118,18 +123,18 @@ export const AuthService = {
   generateMockToken(): string {
     // This is just a mock token for development
     // In production, you would get a real JWT from your server
-    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+    const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
     const payload = btoa(
       JSON.stringify({
-        sub: 'user-1',
+        sub: "user-1",
         name: DEFAULT_USER.name,
         email: DEFAULT_USER.email,
         role: DEFAULT_USER.role,
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours
-      })
+      }),
     );
-    const signature = btoa('mock-signature');
+    const signature = btoa("mock-signature");
 
     return `${header}.${payload}.${signature}`;
   },

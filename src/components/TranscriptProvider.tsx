@@ -1,41 +1,47 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Transcript, TranscriptStatus } from '@/types/transcript';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { Transcript, TranscriptStatus } from "@/types/transcript";
 
 // Mock data for demonstration (in real app, this would be fetched from API)
 const mockTranscripts: Transcript[] = [
   {
-    id: '1',
-    title: 'Team Meeting - Product Strategy',
-    uploadDate: new Date('2023-10-15'),
+    id: "1",
+    title: "Team Meeting - Product Strategy",
+    uploadDate: new Date("2023-10-15"),
     status: TranscriptStatus.ANALYZED,
-    tags: ['Product', 'Strategy', 'Q4'],
+    tags: ["Product", "Strategy", "Q4"],
     duration: 45 * 60, // 45 minutes
     speakerCount: 5,
     fileSize: 2400000, // ~2.4MB
-    fileType: '.txt',
+    fileType: ".txt",
   },
   {
-    id: '2',
-    title: 'Client Interview - Feedback Session',
-    uploadDate: new Date('2023-10-10'),
+    id: "2",
+    title: "Client Interview - Feedback Session",
+    uploadDate: new Date("2023-10-10"),
     status: TranscriptStatus.PROCESSING,
-    tags: ['Client', 'Feedback'],
+    tags: ["Client", "Feedback"],
     duration: 32 * 60, // 32 minutes
     speakerCount: 3,
     fileSize: 1800000, // ~1.8MB
-    fileType: '.vtt',
+    fileType: ".vtt",
   },
   {
-    id: '3',
-    title: 'Engineering Stand-up',
-    uploadDate: new Date('2023-10-05'),
+    id: "3",
+    title: "Engineering Stand-up",
+    uploadDate: new Date("2023-10-05"),
     status: TranscriptStatus.UPLOADED,
     duration: 15 * 60, // 15 minutes
     speakerCount: 8,
     fileSize: 950000, // ~950KB
-    fileType: '.srt',
+    fileType: ".srt",
   },
 ];
 
@@ -51,12 +57,14 @@ interface TranscriptContextType {
   analyzeUploadedTranscript: (file: File) => Promise<Transcript>;
 }
 
-const TranscriptContext = createContext<TranscriptContextType | undefined>(undefined);
+const TranscriptContext = createContext<TranscriptContextType | undefined>(
+  undefined,
+);
 
 export function useTranscripts() {
   const context = useContext(TranscriptContext);
   if (context === undefined) {
-    throw new Error('useTranscripts must be used within a TranscriptProvider');
+    throw new Error("useTranscripts must be used within a TranscriptProvider");
   }
   return context;
 }
@@ -76,10 +84,12 @@ export function TranscriptProvider({ children }: TranscriptProviderProps) {
       setIsLoading(true);
       try {
         // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         setTranscripts(mockTranscripts);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch transcripts'));
+        setError(
+          err instanceof Error ? err : new Error("Failed to fetch transcripts"),
+        );
       } finally {
         setIsLoading(false);
       }
@@ -89,27 +99,29 @@ export function TranscriptProvider({ children }: TranscriptProviderProps) {
   }, []);
 
   const getTranscript = (id: string) => {
-    console.log('Getting transcript:', id);
-    return transcripts.find(t => t.id === id);
+    console.log("Getting transcript:", id);
+    return transcripts.find((t) => t.id === id);
   };
 
   const addTranscript = (transcript: Transcript) => {
-    setTranscripts(prev => [transcript, ...prev]);
+    setTranscripts((prev) => [transcript, ...prev]);
   };
 
   const updateTranscript = (id: string, updates: Partial<Transcript>) => {
-    setTranscripts(prev => prev.map(t => (t.id === id ? { ...t, ...updates } : t)));
+    setTranscripts((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, ...updates } : t)),
+    );
   };
 
   const deleteTranscript = (id: string) => {
-    setTranscripts(prev => prev.filter(t => t.id !== id));
+    setTranscripts((prev) => prev.filter((t) => t.id !== id));
   };
 
   const analyzeTranscript = async (id: string) => {
     const transcript = getTranscript(id);
-    console.log('Analyzing transcript:', transcript);
+    console.log("Analyzing transcript:", transcript);
     if (!transcript) {
-      throw new Error('Transcript not found');
+      throw new Error("Transcript not found");
     }
 
     // Update status to PROCESSING
@@ -125,27 +137,30 @@ export function TranscriptProvider({ children }: TranscriptProviderProps) {
       const transcriptText =
         transcript.summary ||
         `Title: ${transcript.title}\nDate: ${transcript.uploadDate}\n` +
-          (transcript.tags ? `Tags: ${transcript.tags.join(', ')}\n` : '') +
+          (transcript.tags ? `Tags: ${transcript.tags.join(", ")}\n` : "") +
           `This is a structured representation of transcript ID: ${transcript.id}`;
 
-      const transcriptBlob = new Blob([transcriptText], { type: 'text/plain' });
+      const transcriptBlob = new Blob([transcriptText], { type: "text/plain" });
 
       // Append the transcript as a file with just the name "transcript"
-      formData.append('transcript', transcriptBlob, 'transcript.txt');
+      formData.append("transcript", transcriptBlob, "transcript.txt");
 
       // Add optional metadata as form fields
-      formData.append('meetingTitle', transcript.title || 'Untitled Meeting');
+      formData.append("meetingTitle", transcript.title || "Untitled Meeting");
       if (transcript.tags && transcript.tags.length) {
-        formData.append('participantIds', JSON.stringify(transcript.tags));
+        formData.append("participantIds", JSON.stringify(transcript.tags));
       }
 
-      console.log('Form data:', formData.get('transcript'));
+      console.log("Form data:", formData.get("transcript"));
       // Call the API endpoint
       // Centralize API URL
-      const response = await fetch('http://localhost:3000/api/generate-summary/summary', {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await fetch(
+        "http://localhost:3000/api/generate-summary/summary",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
 
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
@@ -153,24 +168,24 @@ export function TranscriptProvider({ children }: TranscriptProviderProps) {
 
       const result = await response.json();
 
-      console.log('Result:', result);
+      console.log("Result:", result);
       // Update the transcript with the analysis results
       updateTranscript(id, {
         status: TranscriptStatus.ANALYZED,
-        summary: result.analysis?.summary || '',
+        summary: result.analysis?.summary || "",
         keyPoints: Array.isArray(result.analysis?.decisions)
           ? result.analysis.decisions.map((d: any) => d.title)
           : [],
         speakerCount:
-          typeof result.analysis?.speakerCount === 'number'
+          typeof result.analysis?.speakerCount === "number"
             ? result.analysis.speakerCount
             : transcript.speakerCount,
         tags: Array.isArray(result.analysis?.tags)
           ? result.analysis.tags
-          : transcript.tags || ['Auto-tagged'],
+          : transcript.tags || ["Auto-tagged"],
       });
     } catch (error) {
-      console.error('Error analyzing transcript:', error);
+      console.error("Error analyzing transcript:", error);
 
       // Update status to ERROR if analysis failed
       updateTranscript(id, { status: TranscriptStatus.ERROR });
@@ -184,11 +199,11 @@ export function TranscriptProvider({ children }: TranscriptProviderProps) {
     // Create a temporary transcript object
     const tempTranscript: Transcript = {
       id: tempId,
-      title: file.name.replace(/\.[^/.]+$/, ''), // Remove file extension from name
+      title: file.name.replace(/\.[^/.]+$/, ""), // Remove file extension from name
       uploadDate: new Date(),
       status: TranscriptStatus.PROCESSING,
       fileSize: file.size,
-      fileType: file.name.substring(file.name.lastIndexOf('.')),
+      fileType: file.name.substring(file.name.lastIndexOf(".")),
       speakerCount: 0,
       duration: 0,
       isTemporary: true, // Mark as temporary
@@ -200,13 +215,16 @@ export function TranscriptProvider({ children }: TranscriptProviderProps) {
     try {
       // Create form data for API
       const formData = new FormData();
-      formData.append('transcript', file);
+      formData.append("transcript", file);
 
       // Call the summary API endpoint
-      const response = await fetch('http://localhost:3000/api/generate-summary/summary', {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await fetch(
+        "http://localhost:3000/api/generate-summary/summary",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
 
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
@@ -218,10 +236,11 @@ export function TranscriptProvider({ children }: TranscriptProviderProps) {
       const analyzedTranscript: Transcript = {
         ...tempTranscript,
         status: TranscriptStatus.ANALYZED,
-        summary: result.summary || '',
+        summary: result.summary || "",
         keyPoints: Array.isArray(result.keyPoints) ? result.keyPoints : [],
-        speakerCount: typeof result.speakerCount === 'number' ? result.speakerCount : 0,
-        tags: Array.isArray(result.tags) ? result.tags : ['Auto-tagged'],
+        speakerCount:
+          typeof result.speakerCount === "number" ? result.speakerCount : 0,
+        tags: Array.isArray(result.tags) ? result.tags : ["Auto-tagged"],
       };
 
       // Update in state
@@ -229,7 +248,7 @@ export function TranscriptProvider({ children }: TranscriptProviderProps) {
 
       return analyzedTranscript;
     } catch (error) {
-      console.error('Error analyzing transcript:', error);
+      console.error("Error analyzing transcript:", error);
 
       // Update status to ERROR
       updateTranscript(tempId, { status: TranscriptStatus.ERROR });
@@ -249,5 +268,9 @@ export function TranscriptProvider({ children }: TranscriptProviderProps) {
     analyzeUploadedTranscript,
   };
 
-  return <TranscriptContext.Provider value={value}>{children}</TranscriptContext.Provider>;
+  return (
+    <TranscriptContext.Provider value={value}>
+      {children}
+    </TranscriptContext.Provider>
+  );
 }

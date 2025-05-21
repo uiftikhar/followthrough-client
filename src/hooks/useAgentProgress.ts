@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { API_CONFIG } from '../config/api';
-import { fetchWithAuth } from '../lib/utils/auth-fetch';
+import { useState, useEffect, useCallback } from "react";
+import { API_CONFIG } from "../config/api";
+import { fetchWithAuth } from "../lib/utils/auth-fetch";
 
 /**
  * Agent progress response
@@ -37,7 +37,7 @@ interface UseAgentProgressOptions {
  */
 export function useAgentProgress(
   sessionId: string | null,
-  options: UseAgentProgressOptions = {}
+  options: UseAgentProgressOptions = {},
 ): {
   progress: number;
   status: string;
@@ -47,7 +47,7 @@ export function useAgentProgress(
   checkNow: () => Promise<void>;
 } {
   const [progress, setProgress] = useState<number>(0);
-  const [status, setStatus] = useState<string>('pending');
+  const [status, setStatus] = useState<string>("pending");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const [details, setDetails] = useState<Record<string, any> | null>(null);
@@ -67,11 +67,11 @@ export function useAgentProgress(
       setError(null);
 
       const response = await fetchWithAuth(
-        `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.agents.progress(sessionId)}`
+        `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.agents.progress(sessionId)}`,
       );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch agent progress');
+        throw new Error("Failed to fetch agent progress");
       }
 
       const data: AgentProgressResponse = await response.json();
@@ -81,8 +81,8 @@ export function useAgentProgress(
       setDetails(data.details || null);
       setIsLoading(false);
     } catch (error) {
-      console.error('Error checking agent progress:', error);
-      setError(error instanceof Error ? error : new Error('Unknown error'));
+      console.error("Error checking agent progress:", error);
+      setError(error instanceof Error ? error : new Error("Unknown error"));
       setIsLoading(false);
     }
   }, [sessionId, setError, setIsLoading, setProgress, setStatus, setDetails]);
@@ -90,7 +90,7 @@ export function useAgentProgress(
   useEffect(() => {
     // Reset state when sessionId changes
     setProgress(0);
-    setStatus('pending');
+    setStatus("pending");
     setError(null);
     setDetails(null);
 
@@ -111,7 +111,7 @@ export function useAgentProgress(
         await checkProgress();
 
         // Stop polling if we're at 100% and stopAtCompletion is true
-        if (stopAtCompletion && (progress === 100 || status === 'completed')) {
+        if (stopAtCompletion && (progress === 100 || status === "completed")) {
           if (intervalId) {
             clearInterval(intervalId);
           }
@@ -125,7 +125,13 @@ export function useAgentProgress(
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId, pollingInterval, stopAtCompletion, checkProgress, pollImmediately]);
+  }, [
+    sessionId,
+    pollingInterval,
+    stopAtCompletion,
+    checkProgress,
+    pollImmediately,
+  ]);
 
   return {
     progress,
