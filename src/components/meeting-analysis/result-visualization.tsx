@@ -17,6 +17,7 @@ import {
   ActionItem,
   SentimentSegment,
   Decision,
+  AnalysisResult
 } from "@/types/meeting-analysis";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -47,12 +48,24 @@ export function ResultVisualization({
     if (!data) return null;
 
     // New response format with nested results
-    if ("results" in data && data.results) {
-      // Check if the results field itself also has a nested results field
-      if ("results" in data.results && data.results.results) {
-        return data.results.results;
+    if ('results' in data && data.results) {
+      // Check for the most nested data structure
+      if ('results' in data.results && data.results.results) {
+        // For deeply nested structure
+        return {
+          ...data,
+          ...data.results,
+          // Preserve session ID from the top level
+          sessionId: data.sessionId || data.results.sessionId
+        };
       }
-      return data.results;
+      // For single level nesting
+      return {
+        ...data,
+        ...data.results,
+        // Preserve session ID from the top level
+        sessionId: data.sessionId
+      };
     }
 
     // Legacy format where data is directly on the results object
@@ -60,7 +73,7 @@ export function ResultVisualization({
   };
 
   // Get the actual data
-  const resultData = getResultData() as MeetingAnalysisResponse;
+  const resultData = getResultData();
 
   // Show loading state
   if (isLoading && !resultData) {
@@ -181,6 +194,42 @@ export function ResultVisualization({
           </Badge>
         );
     }
+  };
+
+  // Add this helper function at the top of the component
+  const getSentimentClass = (sentiment: any) => {
+    // If sentiment is a number
+    if (typeof sentiment === 'number') {
+      if (sentiment > 0.3) return "border-l-4 border-green-400 bg-green-50 text-green-700";
+      if (sentiment < -0.3) return "border-l-4 border-red-400 bg-red-50 text-red-700";
+      return "border-l-4 border-gray-400 bg-gray-50 text-gray-700";
+    }
+
+    // If sentiment is a string
+    if (sentiment === "positive") return "border-l-4 border-green-400 bg-green-50 text-green-700";
+    if (sentiment === "negative") return "border-l-4 border-red-400 bg-red-50 text-red-700";
+    if (sentiment === "mixed") return "border-l-4 border-yellow-400 bg-yellow-50 text-yellow-700";
+    
+    // Default
+    return "border-l-4 border-gray-400 bg-gray-50 text-gray-700";
+  };
+
+  // For the overall sentiment badge which has different styling
+  const getSentimentBadgeClass = (sentiment: any) => {
+    // If sentiment is a number
+    if (typeof sentiment === 'number') {
+      if (sentiment > 0.3) return "bg-green-100 text-green-700";
+      if (sentiment < -0.3) return "bg-red-100 text-red-700";
+      return "bg-gray-100 text-gray-700";
+    }
+
+    // If sentiment is a string
+    if (sentiment === "positive") return "bg-green-100 text-green-700";
+    if (sentiment === "negative") return "bg-red-100 text-red-700";
+    if (sentiment === "mixed") return "bg-yellow-100 text-yellow-700";
+    
+    // Default
+    return "bg-gray-100 text-gray-700";
   };
 
   return (
@@ -472,36 +521,34 @@ export function ResultVisualization({
                     <h3 className="text-lg font-medium">Overall Sentiment</h3>
                     <Badge
                       className={`px-3 py-1 ${
-                        (resultData.sentiment?.overall ||
-                          resultData.sentiment?.overallSentiment) === "positive"
-                          ? "bg-green-100 text-green-700"
-                          : (resultData.sentiment?.overall ||
-                                resultData.sentiment?.overallSentiment) ===
-                              "negative"
-                            ? "bg-red-100 text-red-700"
-                            : (resultData.sentiment?.overall ||
-                                  resultData.sentiment?.overallSentiment) ===
-                                "mixed"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-gray-100 text-gray-700"
+                        getSentimentBadgeClass(resultData.sentiment?.overall || 
+                          resultData.sentiment?.overallSentiment)
                       }`}
                     >
-                      {(
-                        resultData.sentiment?.overall ||
-                        resultData.sentiment?.overallSentiment ||
-                        "neutral"
-                      )
-                        .charAt(0)
-                        .toUpperCase() +
-                        (
-                          resultData.sentiment?.overall ||
-                          resultData.sentiment?.overallSentiment ||
-                          "neutral"
-                        ).slice(1)}
+                      {(() => {
+                        // Safely get the sentiment text
+                        const sentimentText = (resultData.sentiment?.overall || 
+                          resultData.sentiment?.overallSentiment || 
+                          "neutral");
+                        
+                        // If sentiment is a number, convert it to a string label
+                        if (typeof sentimentText === 'number') {
+                          if (sentimentText > 0.3) return "Positive";
+                          if (sentimentText < -0.3) return "Negative";
+                          return "Neutral";
+                        }
+                        
+                        // Ensure it's a string before calling charAt
+                        return typeof sentimentText === 'string' 
+                          ? sentimentText.charAt(0).toUpperCase() + sentimentText.slice(1)
+                          : "Neutral";
+                      })()}
                       {resultData.sentiment?.score !== undefined ||
                       resultData.sentiment?.sentimentScore !== undefined
                         ? ` (${(resultData.sentiment?.score ?? resultData.sentiment?.sentimentScore ?? 0).toFixed(2)})`
-                        : ""}
+                        : typeof resultData.sentiment?.overall === 'number'
+                          ? ` (${Number(resultData.sentiment.overall).toFixed(2)})`
+                          : ""}
                     </Badge>
                   </div>
 
@@ -536,11 +583,7 @@ export function ResultVisualization({
                                 <div
                                   key={i}
                                   className={`rounded-lg p-3 ${
-                                    topicSentiment.sentiment === "positive"
-                                      ? "border-l-4 border-green-400 bg-green-50"
-                                      : topicSentiment.sentiment === "negative"
-                                        ? "border-l-4 border-red-400 bg-red-50"
-                                        : "border-l-4 border-gray-400 bg-gray-50"
+                                    getSentimentClass(topicSentiment.sentiment)
                                   }`}
                                 >
                                   <div className="mb-1 flex justify-between">
@@ -548,11 +591,27 @@ export function ResultVisualization({
                                       {topicSentiment.topic}
                                     </span>
                                     <span className="text-xs">
-                                      {topicSentiment.sentiment
-                                        .charAt(0)
-                                        .toUpperCase() +
-                                        topicSentiment.sentiment.slice(1)}
-                                      ({topicSentiment.score})
+                                      {(() => {
+                                        // If sentiment is a number, convert to text
+                                        if (typeof topicSentiment.sentiment === 'number') {
+                                          if (topicSentiment.sentiment > 0.3) return "Positive";
+                                          if (topicSentiment.sentiment < -0.3) return "Negative";
+                                          return "Neutral";
+                                        }
+                                        
+                                        // For string sentiment
+                                        return typeof topicSentiment.sentiment === 'string'
+                                          ? topicSentiment.sentiment.charAt(0).toUpperCase() + 
+                                            topicSentiment.sentiment.slice(1)
+                                          : "Neutral";
+                                      })()}
+                                      {topicSentiment.score !== undefined ? 
+                                        `(${typeof topicSentiment.score === 'number' ? 
+                                            topicSentiment.score.toFixed(2) : 
+                                            topicSentiment.score})` : 
+                                        typeof topicSentiment.sentiment === 'number' ?
+                                        `(${Number(topicSentiment.sentiment).toFixed(2)})` : 
+                                        ''}
                                     </span>
                                   </div>
                                   <p className="text-sm">
@@ -578,11 +637,7 @@ export function ResultVisualization({
                               <div
                                 key={i}
                                 className={`rounded-lg p-3 ${
-                                  segment.sentiment === "positive"
-                                    ? "border-l-4 border-green-400 bg-green-50"
-                                    : segment.sentiment === "negative"
-                                      ? "border-l-4 border-red-400 bg-red-50"
-                                      : "border-l-4 border-gray-400 bg-gray-50"
+                                  getSentimentClass(segment.sentiment)
                                 }`}
                               >
                                 <div className="mb-1 flex justify-between">
@@ -592,9 +647,27 @@ export function ResultVisualization({
                                       : "Unknown Speaker"}
                                   </span>
                                   <span className="text-xs">
-                                    {segment.sentiment.charAt(0).toUpperCase() +
-                                      segment.sentiment.slice(1)}
-                                    ({segment.score.toFixed(2)})
+                                    {(() => {
+                                      // If sentiment is a number, convert to text
+                                      if (typeof segment.sentiment === 'number') {
+                                        if (segment.sentiment > 0.3) return "Positive";
+                                        if (segment.sentiment < -0.3) return "Negative";
+                                        return "Neutral";
+                                      }
+                                      
+                                      // For string sentiment
+                                      return typeof segment.sentiment === 'string'
+                                        ? segment.sentiment.charAt(0).toUpperCase() + 
+                                          segment.sentiment.slice(1)
+                                        : "Neutral";
+                                    })()}
+                                    {segment.score !== undefined ? 
+                                      `(${typeof segment.score === 'number' ? 
+                                          segment.score.toFixed(2) : 
+                                          segment.score})` : 
+                                      typeof segment.sentiment === 'number' ?
+                                      `(${Number(segment.sentiment).toFixed(2)})` :
+                                      ''}
                                   </span>
                                 </div>
                                 <p className="text-sm">{segment.text}</p>

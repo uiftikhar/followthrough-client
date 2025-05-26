@@ -32,6 +32,7 @@ export function ResultVisualizationWrapper({
   const needsRefresh =
     initialData.status === "pending" || initialData.status === "in_progress";
 
+    console.log( "initialData", initialData)
   // Handle manual refresh
   const handleRefresh = useCallback(async () => {
     if (!isAuthenticated) {

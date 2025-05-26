@@ -361,7 +361,7 @@ export default function AgentVisualization({
 
       // Use the server API URL for HTTP requests too
       const apiHost = process.env.NEXT_PUBLIC_API_HOST || "localhost:3000";
-      const apiUrl = `http://${apiHost}${API_CONFIG.endpoints.visualizations.graph(sessionId)}`;
+      const apiUrl = `http://${apiHost}/meeting-analysis/${sessionId}/visualization`;
       console.log("Fetching graph data from:", apiUrl);
 
       const response = await fetch(apiUrl);
@@ -407,7 +407,7 @@ export default function AgentVisualization({
         // Create WebSocket connection - Fix: Use the correct server host instead of client host
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
         const wsHost = process.env.NEXT_PUBLIC_API_HOST || "localhost:3001";
-        const wsUrl = `${protocol}//${wsHost}/ws/visualization`;
+        const wsUrl = `${protocol}//${wsHost}/meeting-analysis/ws/${sessionId}`;
 
         console.log("Connecting to WebSocket:", wsUrl);
         const ws = new WebSocket(wsUrl);
