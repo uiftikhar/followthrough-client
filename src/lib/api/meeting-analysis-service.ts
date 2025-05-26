@@ -64,8 +64,9 @@ export const MeetingAnalysisService = {
       const authConfig = getAuthHeaders();
       console.log("Using API URL:", API_URL);
 
+      
       const response = await axios.post(
-        `${API_URL}/rag-meeting-analysis`,
+        `${API_URL}/api/meeting-analysis`,
         data,
         authConfig,
       );
@@ -94,7 +95,7 @@ export const MeetingAnalysisService = {
       const authConfig = getAuthHeaders();
 
       console.log(
-        `Fetching analysis results from ${API_URL}/rag-meeting-analysis/${sessionId}`,
+        `Fetching analysis results from ${API_URL}/meeting-analysis/${sessionId}`,
       );
       console.log(`Auth token exists: ${!!AuthService.getToken()}`);
       console.log(`Auth headers:`, JSON.stringify(authConfig.headers));
@@ -103,7 +104,7 @@ export const MeetingAnalysisService = {
       logAvailableCookies();
 
       const response = await axios.get(
-        `${API_URL}/rag-meeting-analysis/${sessionId}`,
+        `${API_URL}/meeting-analysis/${sessionId}`,
         authConfig,
       );
 

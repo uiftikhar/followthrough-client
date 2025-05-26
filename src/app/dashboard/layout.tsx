@@ -3,9 +3,15 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { cookies } from "next/headers";
+import { Metadata } from "next";
 
 // Auth options for getServerSession
 import { authOptions } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Dashboard | Productive AI",
+  description: "Transcript Analysis Dashboard",
+};
 
 interface DashboardLayoutProps {
   children: ReactNode;
