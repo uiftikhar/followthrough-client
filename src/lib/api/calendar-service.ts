@@ -5,6 +5,8 @@
  * All actual Google API calls are made server-side for security
  */
 
+import { HttpClient } from "./http-client";
+
 export interface CalendarEvent {
   id: string;
   summary: string;
@@ -85,49 +87,6 @@ export interface Calendar {
 }
 
 export class CalendarService {
-  private static readonly API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-
-  /**
-   * Get the JWT token from localStorage
-   */
-  private static getAuthToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('auth_token');
-  }
-
-  /**
-   * Make authenticated request to server
-   */
-  private static async makeAuthenticatedRequest(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<Response> {
-    const token = this.getAuthToken();
-    
-    if (!token) {
-      throw new Error('Authentication required. Please log in first.');
-    }
-
-    const response = await fetch(`${this.API_BASE}${endpoint}`, {
-      ...options,
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
-
-    if (response.status === 401) {
-      throw new Error('Authentication expired. Please log in again.');
-    }
-
-    if (response.status === 403) {
-      throw new Error('Google account not connected. Please connect your Google account first.');
-    }
-
-    return response;
-  }
-
   /**
    * Get calendar events
    */
@@ -151,16 +110,9 @@ export class CalendarService {
       if (options.orderBy) params.append('orderBy', options.orderBy);
 
       const calendarId = options.calendarId || 'primary';
-      const response = await this.makeAuthenticatedRequest(
-        `/integrations/calendar/${calendarId}/events?${params.toString()}`
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to get calendar events: ${response.status}`);
-      }
-
-      return await response.json();
+      const endpoint = `/integrations/calendar/${calendarId}/events${params.toString() ? `?${params.toString()}` : ''}`;
+      const response = await HttpClient.get(endpoint);
+      return await HttpClient.parseJsonResponse<CalendarEventsResponse>(response);
     } catch (error) {
       console.error('Failed to get calendar events:', error);
       throw error;
@@ -209,20 +161,8 @@ export class CalendarService {
     calendarId: string = 'primary'
   ): Promise<CalendarEvent> {
     try {
-      const response = await this.makeAuthenticatedRequest(
-        `/integrations/calendar/${calendarId}/events`,
-        {
-          method: 'POST',
-          body: JSON.stringify(eventData),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to create calendar event: ${response.status}`);
-      }
-
-      return await response.json();
+      const response = await HttpClient.post(`/integrations/calendar/${calendarId}/events`, eventData);
+      return await HttpClient.parseJsonResponse<CalendarEvent>(response);
     } catch (error) {
       console.error('Failed to create calendar event:', error);
       throw error;
@@ -237,16 +177,8 @@ export class CalendarService {
     calendarId: string = 'primary'
   ): Promise<CalendarEvent> {
     try {
-      const response = await this.makeAuthenticatedRequest(
-        `/integrations/calendar/${calendarId}/events/${eventId}`
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to get calendar event: ${response.status}`);
-      }
-
-      return await response.json();
+      const response = await HttpClient.get(`/integrations/calendar/${calendarId}/events/${eventId}`);
+      return await HttpClient.parseJsonResponse<CalendarEvent>(response);
     } catch (error) {
       console.error('Failed to get calendar event:', error);
       throw error;
@@ -262,20 +194,8 @@ export class CalendarService {
     calendarId: string = 'primary'
   ): Promise<CalendarEvent> {
     try {
-      const response = await this.makeAuthenticatedRequest(
-        `/integrations/calendar/${calendarId}/events/${eventId}`,
-        {
-          method: 'PUT',
-          body: JSON.stringify(eventData),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to update calendar event: ${response.status}`);
-      }
-
-      return await response.json();
+      const response = await HttpClient.put(`/integrations/calendar/${calendarId}/events/${eventId}`, eventData);
+      return await HttpClient.parseJsonResponse<CalendarEvent>(response);
     } catch (error) {
       console.error('Failed to update calendar event:', error);
       throw error;
@@ -290,17 +210,7 @@ export class CalendarService {
     calendarId: string = 'primary'
   ): Promise<void> {
     try {
-      const response = await this.makeAuthenticatedRequest(
-        `/integrations/calendar/${calendarId}/events/${eventId}`,
-        {
-          method: 'DELETE',
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to delete calendar event: ${response.status}`);
-      }
+      await HttpClient.delete(`/integrations/calendar/${calendarId}/events/${eventId}`);
     } catch (error) {
       console.error('Failed to delete calendar event:', error);
       throw error;
@@ -312,14 +222,8 @@ export class CalendarService {
    */
   static async getCalendars(): Promise<Calendar[]> {
     try {
-      const response = await this.makeAuthenticatedRequest('/integrations/calendar/calendars');
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to get calendars: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const response = await HttpClient.get('/integrations/calendar/calendars');
+      const data = await HttpClient.parseJsonResponse<{ items?: Calendar[] }>(response);
       return data.items || [];
     } catch (error) {
       console.error('Failed to get calendars:', error);

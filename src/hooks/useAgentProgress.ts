@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { API_CONFIG } from "../config/api";
-import { fetchWithAuth } from "../lib/utils/auth-fetch";
+import { HttpClient } from "../lib/api/http-client";
 
 /**
  * Agent progress response
@@ -66,15 +66,8 @@ export function useAgentProgress(
       setIsLoading(true);
       setError(null);
 
-      const response = await fetchWithAuth(
-        `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.agents.progress(sessionId)}`,
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch agent progress");
-      }
-
-      const data: AgentProgressResponse = await response.json();
+      const response = await HttpClient.get(API_CONFIG.endpoints.agents.progress(sessionId));
+      const data = await HttpClient.parseJsonResponse<AgentProgressResponse>(response);
 
       setProgress(data.progress);
       setStatus(data.status);

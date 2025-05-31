@@ -1,9 +1,6 @@
-import axios from "axios";
+import { HttpClient } from "./http-client";
 import Cookies from "js-cookie";
 import { API_CONFIG } from "@/config/api";
-
-// Use the API_CONFIG which now properly handles browser vs server context
-const API_URL = API_CONFIG.baseUrl;
 
 // Cookie settings for better security
 const COOKIE_OPTIONS = {
@@ -39,16 +36,15 @@ interface AuthResponse {
 export const AuthService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      console.log("Attempting login with API URL:", API_URL);
-      const response = await axios.post(`${API_URL}/auth/login`, credentials, {
-        withCredentials: true,
-      });
+      console.log("Attempting login with centralized HTTP client");
+      const response = await HttpClient.post('/auth/login', credentials, false);
+      const data = await HttpClient.parseJsonResponse<AuthResponse>(response);
 
       // Store tokens in both localStorage and cookies for client/server sync
-      this.setToken(response.data.accessToken);
-      this.setRefreshToken(response.data.refreshToken);
+      this.setToken(data.accessToken);
+      this.setRefreshToken(data.refreshToken);
 
-      return response.data;
+      return data;
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -57,19 +53,14 @@ export const AuthService = {
 
   async signup(credentials: SignUpCredentials): Promise<AuthResponse> {
     try {
-      const response = await axios.post(
-        `${API_URL}/auth/register`,
-        credentials,
-        {
-          withCredentials: true,
-        },
-      );
+      const response = await HttpClient.post('/auth/register', credentials, false);
+      const data = await HttpClient.parseJsonResponse<AuthResponse>(response);
 
       // Store tokens in both localStorage and cookies
-      this.setToken(response.data.accessToken);
-      this.setRefreshToken(response.data.refreshToken);
+      this.setToken(data.accessToken);
+      this.setRefreshToken(data.refreshToken);
 
-      return response.data;
+      return data;
     } catch (error) {
       console.error("Signup error:", error);
       throw error;
@@ -78,13 +69,7 @@ export const AuthService = {
 
   async logout(): Promise<void> {
     try {
-      await axios.post(
-        `${API_URL}/auth/logout`,
-        {},
-        {
-          withCredentials: true,
-        },
-      );
+      await HttpClient.post('/auth/logout', {}, true);
       this.clearToken();
     } catch (error) {
       console.error("Logout error:", error);
@@ -96,19 +81,14 @@ export const AuthService = {
   async refreshToken(): Promise<AuthResponse> {
     try {
       const refreshToken = this.getRefreshToken();
-      const response = await axios.post(
-        `${API_URL}/auth/refresh`,
-        { refreshToken },
-        {
-          withCredentials: true,
-        },
-      );
+      const response = await HttpClient.post('/auth/refresh', { refreshToken }, false);
+      const data = await HttpClient.parseJsonResponse<AuthResponse>(response);
 
       // Update stored tokens
-      this.setToken(response.data.accessToken);
-      this.setRefreshToken(response.data.refreshToken);
+      this.setToken(data.accessToken);
+      this.setRefreshToken(data.refreshToken);
 
-      return response.data;
+      return data;
     } catch (error) {
       console.error("Token refresh error:", error);
       throw error;

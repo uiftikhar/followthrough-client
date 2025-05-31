@@ -5,6 +5,8 @@
  * All actual Google API calls are made server-side for security
  */
 
+import { HttpClient } from "./http-client";
+
 export interface GmailMessage {
   id: string;
   threadId: string;
@@ -44,49 +46,6 @@ export interface SendEmailResponse {
 }
 
 export class GmailService {
-  private static readonly API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-
-  /**
-   * Get the JWT token from localStorage
-   */
-  private static getAuthToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('auth_token');
-  }
-
-  /**
-   * Make authenticated request to server
-   */
-  private static async makeAuthenticatedRequest(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<Response> {
-    const token = this.getAuthToken();
-    
-    if (!token) {
-      throw new Error('Authentication required. Please log in first.');
-    }
-
-    const response = await fetch(`${this.API_BASE}${endpoint}`, {
-      ...options,
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
-
-    if (response.status === 401) {
-      throw new Error('Authentication expired. Please log in again.');
-    }
-
-    if (response.status === 403) {
-      throw new Error('Google account not connected. Please connect your Google account first.');
-    }
-
-    return response;
-  }
-
   /**
    * Get Gmail messages
    */
@@ -106,16 +65,9 @@ export class GmailService {
         options.labelIds.forEach(labelId => params.append('labelIds', labelId));
       }
 
-      const response = await this.makeAuthenticatedRequest(
-        `/integrations/gmail/messages?${params.toString()}`
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to get Gmail messages: ${response.status}`);
-      }
-
-      return await response.json();
+      const endpoint = `/integrations/gmail/messages${params.toString() ? `?${params.toString()}` : ''}`;
+      const response = await HttpClient.get(endpoint);
+      return await HttpClient.parseJsonResponse<GmailMessagesResponse>(response);
     } catch (error) {
       console.error('Failed to get Gmail messages:', error);
       throw error;
@@ -127,16 +79,8 @@ export class GmailService {
    */
   static async getMessage(messageId: string): Promise<GmailMessage> {
     try {
-      const response = await this.makeAuthenticatedRequest(
-        `/integrations/gmail/messages/${messageId}`
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to get Gmail message: ${response.status}`);
-      }
-
-      return await response.json();
+      const response = await HttpClient.get(`/integrations/gmail/messages/${messageId}`);
+      return await HttpClient.parseJsonResponse<GmailMessage>(response);
     } catch (error) {
       console.error('Failed to get Gmail message:', error);
       throw error;
@@ -148,20 +92,8 @@ export class GmailService {
    */
   static async sendEmail(emailData: SendEmailRequest): Promise<SendEmailResponse> {
     try {
-      const response = await this.makeAuthenticatedRequest(
-        '/integrations/gmail/send',
-        {
-          method: 'POST',
-          body: JSON.stringify(emailData),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to send email: ${response.status}`);
-      }
-
-      return await response.json();
+      const response = await HttpClient.post('/integrations/gmail/send', emailData);
+      return await HttpClient.parseJsonResponse<SendEmailResponse>(response);
     } catch (error) {
       console.error('Failed to send email:', error);
       throw error;
@@ -209,14 +141,8 @@ export class GmailService {
    */
   static async getLabels(): Promise<any[]> {
     try {
-      const response = await this.makeAuthenticatedRequest('/integrations/gmail/labels');
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to get Gmail labels: ${response.status}`);
-      }
-
-      return await response.json();
+      const response = await HttpClient.get('/integrations/gmail/labels');
+      return await HttpClient.parseJsonResponse<any[]>(response);
     } catch (error) {
       console.error('Failed to get Gmail labels:', error);
       throw error;
@@ -228,14 +154,8 @@ export class GmailService {
    */
   static async getProfile(): Promise<any> {
     try {
-      const response = await this.makeAuthenticatedRequest('/integrations/gmail/profile');
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to get Gmail profile: ${response.status}`);
-      }
-
-      return await response.json();
+      const response = await HttpClient.get('/integrations/gmail/profile');
+      return await HttpClient.parseJsonResponse<any>(response);
     } catch (error) {
       console.error('Failed to get Gmail profile:', error);
       throw error;

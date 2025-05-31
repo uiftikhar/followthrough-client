@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
+import { GmailNotificationsButton } from "@/components/auth/GmailNotificationsButton";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 
@@ -82,6 +83,24 @@ export default function DashboardPage() {
     });
   };
 
+  const handleNotificationStatusChange = (status: any) => {
+    // Since notificationsEnabled is now derived from health data,
+    // we'll check if the operation was successful
+    if (status.success && status.isConnected) {
+      setAuthMessage({
+        type: 'success',
+        message: 'Gmail connection updated successfully!'
+      });
+    }
+  };
+
+  const handleNotificationError = (error: string) => {
+    setAuthMessage({
+      type: 'error',
+      message: `Gmail Notifications Error: ${error}`
+    });
+  };
+
   // Auto-hide messages after 10 seconds
   useEffect(() => {
     if (authMessage) {
@@ -123,6 +142,12 @@ export default function DashboardPage() {
       <GoogleAuthButton
         onAuthSuccess={handleAuthSuccess}
         onAuthError={handleAuthError}
+      />
+
+      {/* Gmail Push Notifications Section */}
+      <GmailNotificationsButton
+        onStatusChange={handleNotificationStatusChange}
+        onError={handleNotificationError}
       />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">

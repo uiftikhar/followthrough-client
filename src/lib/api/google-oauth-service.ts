@@ -5,6 +5,7 @@
  * All sensitive operations are performed server-side for security
  */
 
+import { HttpClient } from './http-client';
 import { AuthService } from './auth-service';
 
 export interface GoogleConnectionStatus {
@@ -32,64 +33,35 @@ export interface GoogleTestResult {
 }
 
 export class GoogleOAuthService {
-  private static readonly API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-
   /**
-   * Get the JWT token from localStorage
+   * Make authenticated request with automatic token refresh for Google OAuth
    */
-  private static getAuthToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('auth_token');
-  }
-
-  /**
-   * Make authenticated request to server
-   */
-  private static async makeAuthenticatedRequest(
+  private static async makeAuthenticatedRequestWithRefresh(
     endpoint: string, 
     options: RequestInit = {}
   ): Promise<Response> {
-    const token = this.getAuthToken();
-    
-    if (!token) {
-      throw new Error('Authentication required. Please log in first.');
-    }
-
-    const response = await fetch(`${this.API_BASE}${endpoint}`, {
-      ...options,
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    });
-
-    console.log("********************* GOOGLE AUTH *********************", response)
-    // If we get 401, try to refresh the token automatically
-    if (response.status === 401) {
-      console.log('🔄 Token expired, attempting automatic refresh...');
-      
-      try {
-        await AuthService.refreshToken();
-        console.log('✅ Token refresh successful, retrying request...');
+    try {
+      // Try the normal authenticated request first
+      return await HttpClient.authenticatedRequest(endpoint, options);
+    } catch (error) {
+      // If it's an auth error, try to refresh the token
+      if (error instanceof Error && error.message.includes('Authentication expired')) {
+        console.log('🔄 Token expired, attempting automatic refresh...');
         
-        // Retry the request with the new token
-        const newToken = this.getAuthToken();
-        return fetch(`${this.API_BASE}${endpoint}`, {
-          ...options,
-          headers: {
-            'Authorization': `Bearer ${newToken}`,
-            'Content-Type': 'application/json',
-            ...options.headers,
-          },
-        });
-      } catch (refreshError) {
-        console.error('❌ Token refresh failed:', refreshError);
-        throw new Error('Authentication expired and refresh failed. Please log in again.');
+        try {
+          await AuthService.refreshToken();
+          console.log('✅ Token refresh successful, retrying request...');
+          
+          // Retry the request with the new token
+          return await HttpClient.authenticatedRequest(endpoint, options);
+        } catch (refreshError) {
+          console.error('❌ Token refresh failed:', refreshError);
+          throw new Error('Authentication expired and refresh failed. Please log in again.');
+        }
       }
+      
+      throw error;
     }
-
-    return response;
   }
 
   /**
@@ -97,14 +69,10 @@ export class GoogleOAuthService {
    */
   static async initiateGoogleOAuth(): Promise<void> {
     try {
-      const response = await this.makeAuthenticatedRequest('/oauth/google/authorize');
+      const response = await this.makeAuthenticatedRequestWithRefresh('/oauth/google/authorize');
       console.log("********************* GOOGLE AUTH *********************", response)
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Server error: ${response.status}`);
-      }
-
-      const data = await response.json();
+      
+      const data = await HttpClient.parseJsonResponse<{ success: boolean; authUrl: string }>(response);
       
       if (!data.success || !data.authUrl) {
         throw new Error('Failed to get authorization URL from server');
@@ -124,14 +92,17 @@ export class GoogleOAuthService {
    */
   static async getGoogleConnectionStatus(): Promise<GoogleConnectionStatus> {
     try {
-      const response = await this.makeAuthenticatedRequest('/oauth/google/status');
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to get status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const response = await this.makeAuthenticatedRequestWithRefresh('/oauth/google/status');
+      const data = await HttpClient.parseJsonResponse<{
+        isConnected: boolean;
+        expiresAt?: string;
+        needsRefresh?: boolean;
+        userInfo?: {
+          googleEmail: string;
+          googleName?: string;
+          googleId: string;
+        };
+      }>(response);
       
       return {
         isConnected: data.isConnected || false,
@@ -152,16 +123,11 @@ export class GoogleOAuthService {
    */
   static async revokeGoogleAccess(): Promise<boolean> {
     try {
-      const response = await this.makeAuthenticatedRequest('/oauth/google/revoke', {
+      const response = await this.makeAuthenticatedRequestWithRefresh('/oauth/google/revoke', {
         method: 'DELETE',
       });
       
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to revoke access: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await HttpClient.parseJsonResponse<{ success: boolean }>(response);
       return data.success || false;
       
     } catch (error) {
@@ -175,20 +141,8 @@ export class GoogleOAuthService {
    */
   static async testGoogleConnection(): Promise<GoogleTestResult> {
     try {
-      const response = await this.makeAuthenticatedRequest('/oauth/google/test');
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        return {
-          success: false,
-          message: errorData.message || `Test failed: ${response.status}`,
-          isConnected: false,
-          error: errorData.error,
-        };
-      }
-
-      const data = await response.json();
-      return data as GoogleTestResult;
+      const response = await this.makeAuthenticatedRequestWithRefresh('/oauth/google/test');
+      return await HttpClient.parseJsonResponse<GoogleTestResult>(response);
       
     } catch (error) {
       console.error('Failed to test Google connection:', error);
@@ -206,16 +160,11 @@ export class GoogleOAuthService {
    */
   static async refreshTokens(): Promise<boolean> {
     try {
-      const response = await this.makeAuthenticatedRequest('/oauth/google/refresh', {
+      const response = await this.makeAuthenticatedRequestWithRefresh('/oauth/google/refresh', {
         method: 'POST',
       });
       
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to refresh tokens: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await HttpClient.parseJsonResponse<{ success: boolean }>(response);
       return data.success || false;
       
     } catch (error) {
@@ -228,7 +177,7 @@ export class GoogleOAuthService {
    * Check if user is authenticated (has valid JWT token)
    */
   static async isAuthenticated(): Promise<boolean> {
-    const token = this.getAuthToken();
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
     
     if (!token) {
       return false;

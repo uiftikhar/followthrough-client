@@ -1,6 +1,4 @@
-import axios from "axios";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+import { HttpClient } from "./http-client";
 
 export interface ChatSession {
   id: string;
@@ -64,25 +62,16 @@ export const chatApi = {
     userId: string,
     metadata?: Record<string, any>,
   ): Promise<ChatSession> {
-    const response = await axios.post(
-      `${API_URL}/api/chat/session`,
-      { userId, metadata },
-      { withCredentials: true },
-    );
-    return response.data;
+    const response = await HttpClient.post('/api/chat/session', { userId, metadata });
+    return await HttpClient.parseJsonResponse<ChatSession>(response);
   },
 
   /**
    * Get chat session details
    */
   async getSession(sessionId: string): Promise<ChatSession> {
-    const response = await axios.get(
-      `${API_URL}/api/chat/session/${sessionId}`,
-      {
-        withCredentials: true,
-      },
-    );
-    return response.data;
+    const response = await HttpClient.get(`/api/chat/session/${sessionId}`);
+    return await HttpClient.parseJsonResponse<ChatSession>(response);
   },
 
   /**
@@ -93,12 +82,8 @@ export const chatApi = {
     content: string,
     metadata?: Record<string, any>,
   ): Promise<ChatResponse> {
-    const response = await axios.post(
-      `${API_URL}/api/chat/message`,
-      { sessionId, content, metadata },
-      { withCredentials: true },
-    );
-    return response.data;
+    const response = await HttpClient.post('/api/chat/message', { sessionId, content, metadata });
+    return await HttpClient.parseJsonResponse<ChatResponse>(response);
   },
 
   /**
@@ -108,14 +93,11 @@ export const chatApi = {
     sessionId: string,
     limit?: number,
   ): Promise<ChatMessage[]> {
-    const response = await axios.get(
-      `${API_URL}/api/chat/history/${sessionId}`,
-      {
-        params: { limit },
-        withCredentials: true,
-      },
-    );
-    return response.data;
+    const endpoint = limit 
+      ? `/api/chat/history/${sessionId}?limit=${limit}`
+      : `/api/chat/history/${sessionId}`;
+    const response = await HttpClient.get(endpoint);
+    return await HttpClient.parseJsonResponse<ChatMessage[]>(response);
   },
 
   /**
@@ -127,12 +109,13 @@ export const chatApi = {
     description?: string,
     participants?: Array<{ id: string; name: string; role?: string }>,
   ): Promise<TranscriptUploadResponse> {
-    const response = await axios.post(
-      `${API_URL}/api/chat/transcript/upload`,
-      { transcript, title, description, participants },
-      { withCredentials: true },
-    );
-    return response.data;
+    const response = await HttpClient.post('/api/chat/transcript/upload', {
+      transcript,
+      title,
+      description,
+      participants,
+    });
+    return await HttpClient.parseJsonResponse<TranscriptUploadResponse>(response);
   },
 
   /**
@@ -143,37 +126,26 @@ export const chatApi = {
     goals?: string[],
     options?: Record<string, any>,
   ): Promise<AnalysisStatusResponse> {
-    const response = await axios.post(
-      `${API_URL}/api/chat/transcript/${meetingId}/analyze`,
-      { goals, options },
-      { withCredentials: true },
-    );
-    return response.data;
+    const response = await HttpClient.post(`/api/chat/transcript/${meetingId}/analyze`, {
+      goals,
+      options,
+    });
+    return await HttpClient.parseJsonResponse<AnalysisStatusResponse>(response);
   },
 
   /**
    * Get analysis status
    */
   async getAnalysisStatus(meetingId: string): Promise<AnalysisStatusResponse> {
-    const response = await axios.get(
-      `${API_URL}/api/chat/transcript/${meetingId}/status`,
-      {
-        withCredentials: true,
-      },
-    );
-    return response.data;
+    const response = await HttpClient.get(`/api/chat/transcript/${meetingId}/status`);
+    return await HttpClient.parseJsonResponse<AnalysisStatusResponse>(response);
   },
 
   /**
    * Get related meetings
    */
   async getRelatedMeetings(meetingId: string): Promise<any[]> {
-    const response = await axios.get(
-      `${API_URL}/api/chat/transcript/${meetingId}/related`,
-      {
-        withCredentials: true,
-      },
-    );
-    return response.data;
+    const response = await HttpClient.get(`/api/chat/transcript/${meetingId}/related`);
+    return await HttpClient.parseJsonResponse<any[]>(response);
   },
 };

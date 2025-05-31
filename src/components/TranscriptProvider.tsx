@@ -8,6 +8,7 @@ import React, {
   ReactNode,
 } from "react";
 import { Transcript, TranscriptStatus } from "@/types/transcript";
+import { HttpClient } from "@/lib/api/http-client";
 
 // Mock data for demonstration (in real app, this would be fetched from API)
 const mockTranscripts: Transcript[] = [
@@ -152,21 +153,17 @@ export function TranscriptProvider({ children }: TranscriptProviderProps) {
       }
 
       console.log("Form data:", formData.get("transcript"));
-      // Call the API endpoint
-      // Centralize API URL
-      const response = await fetch(
-        "http://localhost:3000/api/generate-summary/summary",
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const result = await response.json();
+      
+      // Use centralized HTTP client for file upload
+      const response = await HttpClient.uploadFile('/api/generate-summary/summary', formData);
+      const result = await HttpClient.parseJsonResponse<{
+        analysis?: {
+          summary?: string;
+          decisions?: Array<{ title: string }>;
+          speakerCount?: number;
+          tags?: string[];
+        };
+      }>(response);
 
       console.log("Result:", result);
       // Update the transcript with the analysis results
@@ -217,20 +214,14 @@ export function TranscriptProvider({ children }: TranscriptProviderProps) {
       const formData = new FormData();
       formData.append("transcript", file);
 
-      // Call the summary API endpoint
-      const response = await fetch(
-        "http://localhost:3000/api/generate-summary/summary",
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const result = await response.json();
+      // Use centralized HTTP client for file upload
+      const response = await HttpClient.uploadFile('/api/generate-summary/summary', formData);
+      const result = await HttpClient.parseJsonResponse<{
+        summary?: string;
+        keyPoints?: string[];
+        speakerCount?: number;
+        tags?: string[];
+      }>(response);
 
       // Update with analysis results
       const analyzedTranscript: Transcript = {
