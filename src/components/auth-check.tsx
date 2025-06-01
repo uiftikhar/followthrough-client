@@ -26,8 +26,8 @@ export function AuthCheck() {
       // Check if authenticated according to context
       if (isAuthenticated) {
         // Check if token exists in localStorage but not in cookies
-        const localToken = localStorage.getItem("auth_token");
-        const cookieToken = Cookies.get("auth_token");
+        const localToken = localStorage.getItem("jwt_token");
+        const cookieToken = Cookies.get("jwt_token");
 
         // Only log in development
         if (process.env.NODE_ENV === "development") {
@@ -43,7 +43,7 @@ export function AuthCheck() {
 
           // Verify sync was successful
           setTimeout(() => {
-            const cookieToken = Cookies.get("auth_token");
+            const cookieToken = Cookies.get("jwt_token");
             if (process.env.NODE_ENV === "development") {
               console.log(
                 "Auth Check - Cookie Token after sync:",
@@ -73,8 +73,8 @@ export function AuthCheck() {
   // Periodic check to ensure auth is synced
   useEffect(() => {
     const interval = setInterval(() => {
-      const localToken = localStorage.getItem("auth_token");
-      const cookieToken = Cookies.get("auth_token");
+      const localToken = localStorage.getItem("jwt_token");
+      const cookieToken = Cookies.get("jwt_token");
 
       // If there's a mismatch, try to sync
       if ((localToken && !cookieToken) || (!localToken && cookieToken)) {
@@ -82,7 +82,7 @@ export function AuthCheck() {
           AuthService.setToken(localToken);
         } else if (cookieToken) {
           // If only cookie exists, sync back to localStorage
-          localStorage.setItem("auth_token", cookieToken);
+          localStorage.setItem("jwt_token", cookieToken);
         }
       }
     }, 30000); // Check every 30 seconds

@@ -1,15 +1,21 @@
-import { useState, useEffect, useCallback } from 'react';
-import { 
-  GmailNotificationsService, 
-  GmailNotificationStatus, 
-  GmailHealthStatus, 
-  GmailStatistics 
-} from '@/lib/api/gmail-notifications-service';
+import { useState, useEffect, useCallback } from "react";
+import {
+  GmailNotificationsService,
+  type NotificationStatus,
+  type SetupNotificationsResponse,
+  type DisableNotificationsResponse,
+  type WatchInfo,
+} from "@/lib/api/gmail-notifications-service";
+import {
+  GmailHealthService,
+  type SystemHealthResponse,
+  type StatisticsResponse,
+} from "@/lib/api/gmail-health-service";
 
 interface UseGmailNotificationsReturn {
-  status: GmailNotificationStatus;
-  health: GmailHealthStatus | null;
-  statistics: GmailStatistics | null;
+  status: NotificationStatus;
+  health: SystemHealthResponse | null;
+  statistics: StatisticsResponse | null;
   isLoading: boolean;
   error: string | null;
   refreshStatus: () => Promise<void>;
@@ -19,20 +25,18 @@ interface UseGmailNotificationsReturn {
   setupNotifications: (options?: any) => Promise<boolean>;
   disableNotifications: () => Promise<boolean>;
   renewWatch: () => Promise<boolean>;
-  testTriage: () => Promise<any>;
   testPubSub: () => Promise<any>;
   processPullMessages: () => Promise<any>;
 }
 
 export function useGmailNotifications(
-  autoRefreshInterval?: number // in milliseconds
+  autoRefreshInterval?: number, // in milliseconds
 ): UseGmailNotificationsReturn {
-  const [status, setStatus] = useState<GmailNotificationStatus>({
-    success: false,
-    isConnected: false,
+  const [status, setStatus] = useState<NotificationStatus>({
+    isEnabled: false,
   });
-  const [health, setHealth] = useState<GmailHealthStatus | null>(null);
-  const [statistics, setStatistics] = useState<GmailStatistics | null>(null);
+  const [health, setHealth] = useState<SystemHealthResponse | null>(null);
+  const [statistics, setStatistics] = useState<StatisticsResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,19 +53,19 @@ export function useGmailNotifications(
 
   const refreshHealth = useCallback(async () => {
     try {
-      const newHealth = await GmailNotificationsService.getHealth();
+      const newHealth = await GmailHealthService.getSystemHealth();
       setHealth(newHealth);
     } catch (err) {
-      console.error('Failed to refresh health:', err);
+      console.error("Failed to refresh health:", err);
     }
   }, []);
 
   const refreshStatistics = useCallback(async () => {
     try {
-      const newStats = await GmailNotificationsService.getStatistics();
+      const newStats = await GmailHealthService.getStatistics();
       setStatistics(newStats);
     } catch (err) {
-      console.error('Failed to refresh statistics:', err);
+      console.error("Failed to refresh statistics:", err);
     }
   }, []);
 
@@ -78,42 +82,48 @@ export function useGmailNotifications(
     }
   }, [refreshStatus, refreshHealth, refreshStatistics]);
 
-  const setupNotifications = useCallback(async (options?: any): Promise<boolean> => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const result = await GmailNotificationsService.setupNotifications(options);
-      
-      if (result.success) {
-        await refreshStatus();
-        await refreshHealth();
-        return true;
-      } else {
-        throw new Error(result.message || 'Failed to setup notifications');
+  const setupNotifications = useCallback(
+    async (options?: any): Promise<boolean> => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const result =
+          await GmailNotificationsService.setupNotifications(options);
+
+        if (result.success) {
+          await refreshStatus();
+          await refreshHealth();
+          return true;
+        } else {
+          throw new Error(
+            result.error || result.message || "Failed to setup notifications",
+          );
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        setError(errorMessage);
+        return false;
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      setError(errorMessage);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [refreshStatus, refreshHealth]);
+    },
+    [refreshStatus, refreshHealth],
+  );
 
   const disableNotifications = useCallback(async (): Promise<boolean> => {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const result = await GmailNotificationsService.disableNotifications();
-      
+
       if (result.success) {
         await refreshStatus();
         await refreshHealth();
         return true;
       } else {
-        throw new Error(result.message || 'Failed to disable notifications');
+        throw new Error(result.message || "Failed to disable notifications");
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
@@ -128,15 +138,17 @@ export function useGmailNotifications(
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const result = await GmailNotificationsService.renewWatch();
-      
+
       if (result.success) {
         await refreshStatus();
         await refreshHealth();
         return true;
       } else {
-        throw new Error(result.message || 'Failed to renew watch');
+        throw new Error(
+          result.error || result.message || "Failed to renew watch",
+        );
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
@@ -147,32 +159,11 @@ export function useGmailNotifications(
     }
   }, [refreshStatus, refreshHealth]);
 
-  const testTriage = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const result = await GmailNotificationsService.testTriage();
-      
-      if (result.success) {
-        await refreshStatistics();
-      }
-      
-      return result;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [refreshStatistics]);
-
   const testPubSub = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const result = await GmailNotificationsService.testPubSub();
       return result;
     } catch (err) {
@@ -188,13 +179,13 @@ export function useGmailNotifications(
     try {
       setIsLoading(true);
       setError(null);
-      
-      const result = await GmailNotificationsService.processPullMessages();
-      
+
+      const result = await GmailNotificationsService.processPendingMessages();
+
       if (result.success) {
         await refreshStatistics();
       }
-      
+
       return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
@@ -234,8 +225,7 @@ export function useGmailNotifications(
     setupNotifications,
     disableNotifications,
     renewWatch,
-    testTriage,
     testPubSub,
     processPullMessages,
   };
-} 
+}

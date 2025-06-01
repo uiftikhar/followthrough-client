@@ -1,6 +1,6 @@
 /**
  * Centralized HTTP Client
- * 
+ *
  * Handles common HTTP request logic and headers for all API services
  * Includes ngrok header for local development/testing
  */
@@ -18,8 +18,8 @@ export class HttpClient {
    * Get the JWT token from localStorage
    */
   private static getAuthToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('auth_token');
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("jwt_token");
   }
 
   /**
@@ -27,9 +27,9 @@ export class HttpClient {
    */
   private static getCommonHeaders(): HeadersInit {
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       // Add ngrok header for local development/testing
-      'ngrok-skip-browser-warning': 'any-value',
+      "ngrok-skip-browser-warning": "any-value",
     };
 
     return headers;
@@ -41,7 +41,7 @@ export class HttpClient {
   private static getCommonHeadersWithoutContentType(): HeadersInit {
     const headers: HeadersInit = {
       // Add ngrok header for local development/testing
-      'ngrok-skip-browser-warning': 'any-value',
+      "ngrok-skip-browser-warning": "any-value",
     };
 
     return headers;
@@ -55,12 +55,12 @@ export class HttpClient {
     const commonHeaders = this.getCommonHeaders();
 
     if (!token) {
-      throw new Error('Authentication required. Please log in first.');
+      throw new Error("Authentication required. Please log in first.");
     }
 
     return {
       ...commonHeaders,
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     };
   }
 
@@ -72,12 +72,12 @@ export class HttpClient {
     const commonHeaders = this.getCommonHeadersWithoutContentType();
 
     if (!token) {
-      throw new Error('Authentication required. Please log in first.');
+      throw new Error("Authentication required. Please log in first.");
     }
 
     return {
       ...commonHeaders,
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     };
   }
 
@@ -86,7 +86,7 @@ export class HttpClient {
    */
   static async authenticatedRequest(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
   ): Promise<Response> {
     const headers = this.getAuthenticatedHeaders();
 
@@ -100,11 +100,11 @@ export class HttpClient {
 
     // Handle common authentication errors
     if (response.status === 401) {
-      throw new Error('Authentication expired. Please log in again.');
+      throw new Error("Authentication expired. Please log in again.");
     }
 
     if (response.status === 403) {
-      throw new Error('Access denied. Please check your permissions.');
+      throw new Error("Access denied. Please check your permissions.");
     }
 
     return response;
@@ -115,7 +115,7 @@ export class HttpClient {
    */
   static async publicRequest(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
   ): Promise<Response> {
     const headers = this.getCommonHeaders();
 
@@ -133,26 +133,29 @@ export class HttpClient {
   /**
    * Helper method for GET requests
    */
-  static async get(endpoint: string, authenticated: boolean = true): Promise<Response> {
-    return authenticated 
-      ? this.authenticatedRequest(endpoint, { method: 'GET' })
-      : this.publicRequest(endpoint, { method: 'GET' });
+  static async get(
+    endpoint: string,
+    authenticated: boolean = true,
+  ): Promise<Response> {
+    return authenticated
+      ? this.authenticatedRequest(endpoint, { method: "GET" })
+      : this.publicRequest(endpoint, { method: "GET" });
   }
 
   /**
    * Helper method for POST requests
    */
   static async post(
-    endpoint: string, 
-    data?: any, 
-    authenticated: boolean = true
+    endpoint: string,
+    data?: any,
+    authenticated: boolean = true,
   ): Promise<Response> {
     const options: RequestInit = {
-      method: 'POST',
+      method: "POST",
       body: data ? JSON.stringify(data) : undefined,
     };
 
-    return authenticated 
+    return authenticated
       ? this.authenticatedRequest(endpoint, options)
       : this.publicRequest(endpoint, options);
   }
@@ -161,16 +164,16 @@ export class HttpClient {
    * Helper method for PUT requests
    */
   static async put(
-    endpoint: string, 
-    data?: any, 
-    authenticated: boolean = true
+    endpoint: string,
+    data?: any,
+    authenticated: boolean = true,
   ): Promise<Response> {
     const options: RequestInit = {
-      method: 'PUT',
+      method: "PUT",
       body: data ? JSON.stringify(data) : undefined,
     };
 
-    return authenticated 
+    return authenticated
       ? this.authenticatedRequest(endpoint, options)
       : this.publicRequest(endpoint, options);
   }
@@ -178,10 +181,13 @@ export class HttpClient {
   /**
    * Helper method for DELETE requests
    */
-  static async delete(endpoint: string, authenticated: boolean = true): Promise<Response> {
-    return authenticated 
-      ? this.authenticatedRequest(endpoint, { method: 'DELETE' })
-      : this.publicRequest(endpoint, { method: 'DELETE' });
+  static async delete(
+    endpoint: string,
+    authenticated: boolean = true,
+  ): Promise<Response> {
+    return authenticated
+      ? this.authenticatedRequest(endpoint, { method: "DELETE" })
+      : this.publicRequest(endpoint, { method: "DELETE" });
   }
 
   /**
@@ -190,26 +196,28 @@ export class HttpClient {
   static async parseJsonResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Request failed: ${response.status}`);
+      throw new Error(
+        errorData.message || `Request failed: ${response.status}`,
+      );
     }
 
     return await response.json();
   }
 
   /**
-   * Helper method for file uploads (FormData) 
+   * Helper method for file uploads (FormData)
    */
   static async uploadFile(
     endpoint: string,
     formData: FormData,
-    authenticated: boolean = true
+    authenticated: boolean = true,
   ): Promise<Response> {
-    const headers = authenticated 
+    const headers = authenticated
       ? this.getAuthenticatedHeadersWithoutContentType()
       : this.getCommonHeadersWithoutContentType();
 
     const response = await fetch(`${this.API_BASE}${endpoint}`, {
-      method: 'POST',
+      method: "POST",
       body: formData,
       headers,
     });
@@ -217,14 +225,14 @@ export class HttpClient {
     // Handle common authentication errors
     if (authenticated) {
       if (response.status === 401) {
-        throw new Error('Authentication expired. Please log in again.');
+        throw new Error("Authentication expired. Please log in again.");
       }
 
       if (response.status === 403) {
-        throw new Error('Access denied. Please check your permissions.');
+        throw new Error("Access denied. Please check your permissions.");
       }
     }
 
     return response;
   }
-} 
+}

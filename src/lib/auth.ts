@@ -21,10 +21,14 @@ export const authOptions: NextAuthOptions = {
 
         try {
           // Call our backend API for authentication using the centralized HTTP client
-          const response = await HttpClient.post('/auth/login', {
-            email: credentials.email,
-            password: credentials.password,
-          }, false); // false = no authentication required for login
+          const response = await HttpClient.post(
+            "/auth/login",
+            {
+              email: credentials.email,
+              password: credentials.password,
+            },
+            false,
+          ); // false = no authentication required for login
 
           const data = await HttpClient.parseJsonResponse<{
             user: {

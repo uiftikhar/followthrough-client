@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
-import { HealthService, HealthStatus } from "../lib/api/health-service";
+import {
+  GmailHealthService,
+  type SystemHealthResponse,
+} from "../lib/api/gmail-health-service";
 
 /**
- * Connection status for the server
+ * Connection status for the Gmail system
  */
 export type ConnectionStatus =
   | "connected"
@@ -26,17 +29,17 @@ interface UseConnectionStatusOptions {
 }
 
 /**
- * Hook for monitoring server connection status
+ * Hook for monitoring Gmail system connection status
  */
 export function useConnectionStatus(options: UseConnectionStatusOptions = {}): {
   status: ConnectionStatus;
   lastChecked: Date | null;
   checkNow: () => Promise<void>;
-  details: HealthStatus | null;
+  details: SystemHealthResponse | null;
 } {
   const [status, setStatus] = useState<ConnectionStatus>("loading");
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
-  const [details, setDetails] = useState<HealthStatus | null>(null);
+  const [details, setDetails] = useState<SystemHealthResponse | null>(null);
 
   const pollingInterval = options.pollingInterval || 30000; // Default: 30 seconds
   const pollImmediately = options.pollImmediately !== false; // Default: true
@@ -44,20 +47,18 @@ export function useConnectionStatus(options: UseConnectionStatusOptions = {}): {
   // Function to check connection status
   const checkConnection = async (): Promise<void> => {
     try {
-      const healthStatus = await HealthService.checkHealth();
+      const healthStatus = await GmailHealthService.getSystemHealth();
 
       setLastChecked(new Date());
       setDetails(healthStatus);
 
-      if (healthStatus.status === "OK") {
+      if (healthStatus.status === "healthy") {
         setStatus("connected");
-      } else if (healthStatus.status === "DEGRADED") {
-        setStatus("degraded");
       } else {
         setStatus("disconnected");
       }
     } catch (error) {
-      console.error("Failed to check connection status:", error);
+      console.error("Failed to check Gmail system status:", error);
       setStatus("disconnected");
       setLastChecked(new Date());
     }

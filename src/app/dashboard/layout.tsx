@@ -24,7 +24,7 @@ export default async function Layout({ children }: DashboardLayoutProps) {
   // If there's no session, check if there's a token in the cookies
   if (!session) {
     const cookieStore = cookies();
-    const authToken = cookieStore.get("auth_token");
+    const authToken = cookieStore.get("jwt_token");
 
     // If no auth token, redirect to login
     if (!authToken) {

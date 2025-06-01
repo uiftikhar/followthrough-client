@@ -9,7 +9,7 @@ export const transcriptApi = {
    * Get all transcripts for the current user
    */
   async getTranscripts(): Promise<Transcript[]> {
-    const response = await HttpClient.get('/api/transcripts');
+    const response = await HttpClient.get("/api/transcripts");
     return await HttpClient.parseJsonResponse<Transcript[]>(response);
   },
 
@@ -37,7 +37,10 @@ export const transcriptApi = {
     }
 
     // Use the specialized upload method for FormData
-    const response = await HttpClient.uploadFile('/api/transcripts/upload', formData);
+    const response = await HttpClient.uploadFile(
+      "/api/transcripts/upload",
+      formData,
+    );
     return await HttpClient.parseJsonResponse<Transcript>(response);
   },
 
@@ -71,9 +74,12 @@ export const transcriptApi = {
    * Search transcripts
    */
   async searchTranscripts(query: string): Promise<Transcript[]> {
-    const response = await HttpClient.authenticatedRequest(`/api/transcripts/search?query=${encodeURIComponent(query)}`, {
-      method: 'GET',
-    });
+    const response = await HttpClient.authenticatedRequest(
+      `/api/transcripts/search?query=${encodeURIComponent(query)}`,
+      {
+        method: "GET",
+      },
+    );
     return await HttpClient.parseJsonResponse<Transcript[]>(response);
   },
 };

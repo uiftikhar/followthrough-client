@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -13,73 +13,74 @@ import { Button } from "@/components/ui/button";
 export default function DashboardPage() {
   const searchParams = useSearchParams();
   const [authMessage, setAuthMessage] = useState<{
-    type: 'success' | 'error';
+    type: "success" | "error";
     message: string;
   } | null>(null);
   const { logout } = useAuth();
 
   useEffect(() => {
     // Check for OAuth callback messages from server
-    const googleAuthSuccess = searchParams.get('google_auth_success');
-    const googleAuthError = searchParams.get('google_auth_error');
-    const email = searchParams.get('email');
+    const googleAuthSuccess = searchParams.get("google_auth_success");
+    const googleAuthError = searchParams.get("google_auth_error");
+    const email = searchParams.get("email");
 
     if (googleAuthSuccess) {
       setAuthMessage({
-        type: 'success',
-        message: email 
+        type: "success",
+        message: email
           ? `Google services have been successfully connected! (${decodeURIComponent(email)})`
-          : 'Google services have been successfully connected!'
+          : "Google services have been successfully connected!",
       });
-      
+
       // Clear the URL parameters
       const url = new URL(window.location.href);
-      url.searchParams.delete('google_auth_success');
-      url.searchParams.delete('email');
-      window.history.replaceState({}, '', url.toString());
+      url.searchParams.delete("google_auth_success");
+      url.searchParams.delete("email");
+      window.history.replaceState({}, "", url.toString());
     } else if (googleAuthError) {
-      let errorMessage = 'Failed to connect Google services.';
-      
+      let errorMessage = "Failed to connect Google services.";
+
       switch (googleAuthError) {
-        case 'access_denied':
-          errorMessage = 'Google authorization was denied. Please try again if you want to enable Google integration.';
+        case "access_denied":
+          errorMessage =
+            "Google authorization was denied. Please try again if you want to enable Google integration.";
           break;
-        case 'missing_parameters':
-          errorMessage = 'OAuth callback was missing required parameters.';
+        case "missing_parameters":
+          errorMessage = "OAuth callback was missing required parameters.";
           break;
-        case 'oauth_expired':
-          errorMessage = 'OAuth session expired. Please try connecting again.';
+        case "oauth_expired":
+          errorMessage = "OAuth session expired. Please try connecting again.";
           break;
-        case 'callback_failed':
-          errorMessage = 'OAuth callback processing failed on our server.';
+        case "callback_failed":
+          errorMessage = "OAuth callback processing failed on our server.";
           break;
         default:
           errorMessage = `Google OAuth error: ${googleAuthError}`;
       }
-      
+
       setAuthMessage({
-        type: 'error',
-        message: errorMessage
+        type: "error",
+        message: errorMessage,
       });
-      
+
       // Clear the URL parameters
       const url = new URL(window.location.href);
-      url.searchParams.delete('google_auth_error');
-      window.history.replaceState({}, '', url.toString());
+      url.searchParams.delete("google_auth_error");
+      window.history.replaceState({}, "", url.toString());
     }
   }, [searchParams]);
 
   const handleAuthSuccess = () => {
     setAuthMessage({
-      type: 'success',
-      message: 'Google services connected successfully!'
+      type: "success",
+      message: "Google services connected successfully!",
     });
   };
 
   const handleAuthError = (error: string) => {
     setAuthMessage({
-      type: 'error',
-      message: error
+      type: "error",
+      message: error,
     });
   };
 
@@ -88,16 +89,16 @@ export default function DashboardPage() {
     // we'll check if the operation was successful
     if (status.success && status.isConnected) {
       setAuthMessage({
-        type: 'success',
-        message: 'Gmail connection updated successfully!'
+        type: "success",
+        message: "Gmail connection updated successfully!",
       });
     }
   };
 
   const handleNotificationError = (error: string) => {
     setAuthMessage({
-      type: 'error',
-      message: `Gmail Notifications Error: ${error}`
+      type: "error",
+      message: `Gmail Notifications Error: ${error}`,
     });
   };
 
@@ -107,7 +108,7 @@ export default function DashboardPage() {
       const timer = setTimeout(() => {
         setAuthMessage(null);
       }, 10000);
-      
+
       return () => clearTimeout(timer);
     }
   }, [authMessage]);
@@ -125,14 +126,16 @@ export default function DashboardPage() {
 
       {/* Auth Messages */}
       {authMessage && (
-        <Alert variant={authMessage.type === 'error' ? 'destructive' : 'default'}>
-          {authMessage.type === 'success' ? (
+        <Alert
+          variant={authMessage.type === "error" ? "destructive" : "default"}
+        >
+          {authMessage.type === "success" ? (
             <CheckCircle2 className="h-4 w-4" />
           ) : (
             <AlertCircle className="h-4 w-4" />
           )}
           <AlertTitle>
-            {authMessage.type === 'success' ? 'Success' : 'Error'}
+            {authMessage.type === "success" ? "Success" : "Error"}
           </AlertTitle>
           <AlertDescription>{authMessage.message}</AlertDescription>
         </Alert>

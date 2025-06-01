@@ -62,7 +62,10 @@ export const chatApi = {
     userId: string,
     metadata?: Record<string, any>,
   ): Promise<ChatSession> {
-    const response = await HttpClient.post('/api/chat/session', { userId, metadata });
+    const response = await HttpClient.post("/api/chat/session", {
+      userId,
+      metadata,
+    });
     return await HttpClient.parseJsonResponse<ChatSession>(response);
   },
 
@@ -82,7 +85,11 @@ export const chatApi = {
     content: string,
     metadata?: Record<string, any>,
   ): Promise<ChatResponse> {
-    const response = await HttpClient.post('/api/chat/message', { sessionId, content, metadata });
+    const response = await HttpClient.post("/api/chat/message", {
+      sessionId,
+      content,
+      metadata,
+    });
     return await HttpClient.parseJsonResponse<ChatResponse>(response);
   },
 
@@ -93,7 +100,7 @@ export const chatApi = {
     sessionId: string,
     limit?: number,
   ): Promise<ChatMessage[]> {
-    const endpoint = limit 
+    const endpoint = limit
       ? `/api/chat/history/${sessionId}?limit=${limit}`
       : `/api/chat/history/${sessionId}`;
     const response = await HttpClient.get(endpoint);
@@ -109,13 +116,15 @@ export const chatApi = {
     description?: string,
     participants?: Array<{ id: string; name: string; role?: string }>,
   ): Promise<TranscriptUploadResponse> {
-    const response = await HttpClient.post('/api/chat/transcript/upload', {
+    const response = await HttpClient.post("/api/chat/transcript/upload", {
       transcript,
       title,
       description,
       participants,
     });
-    return await HttpClient.parseJsonResponse<TranscriptUploadResponse>(response);
+    return await HttpClient.parseJsonResponse<TranscriptUploadResponse>(
+      response,
+    );
   },
 
   /**
@@ -126,10 +135,13 @@ export const chatApi = {
     goals?: string[],
     options?: Record<string, any>,
   ): Promise<AnalysisStatusResponse> {
-    const response = await HttpClient.post(`/api/chat/transcript/${meetingId}/analyze`, {
-      goals,
-      options,
-    });
+    const response = await HttpClient.post(
+      `/api/chat/transcript/${meetingId}/analyze`,
+      {
+        goals,
+        options,
+      },
+    );
     return await HttpClient.parseJsonResponse<AnalysisStatusResponse>(response);
   },
 
@@ -137,7 +149,9 @@ export const chatApi = {
    * Get analysis status
    */
   async getAnalysisStatus(meetingId: string): Promise<AnalysisStatusResponse> {
-    const response = await HttpClient.get(`/api/chat/transcript/${meetingId}/status`);
+    const response = await HttpClient.get(
+      `/api/chat/transcript/${meetingId}/status`,
+    );
     return await HttpClient.parseJsonResponse<AnalysisStatusResponse>(response);
   },
 
@@ -145,7 +159,9 @@ export const chatApi = {
    * Get related meetings
    */
   async getRelatedMeetings(meetingId: string): Promise<any[]> {
-    const response = await HttpClient.get(`/api/chat/transcript/${meetingId}/related`);
+    const response = await HttpClient.get(
+      `/api/chat/transcript/${meetingId}/related`,
+    );
     return await HttpClient.parseJsonResponse<any[]>(response);
   },
 };

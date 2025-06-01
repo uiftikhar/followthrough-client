@@ -71,7 +71,8 @@ export default function AgentSystemMonitor({
       setError(null);
 
       const response = await HttpClient.get(API_CONFIG.endpoints.agents.status);
-      const data = await HttpClient.parseJsonResponse<AgentStatusReport>(response);
+      const data =
+        await HttpClient.parseJsonResponse<AgentStatusReport>(response);
       setStatusReport(data);
     } catch (err) {
       console.error("Error fetching agent status:", err);

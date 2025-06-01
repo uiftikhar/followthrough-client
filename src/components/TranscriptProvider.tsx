@@ -153,9 +153,12 @@ export function TranscriptProvider({ children }: TranscriptProviderProps) {
       }
 
       console.log("Form data:", formData.get("transcript"));
-      
+
       // Use centralized HTTP client for file upload
-      const response = await HttpClient.uploadFile('/api/generate-summary/summary', formData);
+      const response = await HttpClient.uploadFile(
+        "/api/generate-summary/summary",
+        formData,
+      );
       const result = await HttpClient.parseJsonResponse<{
         analysis?: {
           summary?: string;
@@ -215,7 +218,10 @@ export function TranscriptProvider({ children }: TranscriptProviderProps) {
       formData.append("transcript", file);
 
       // Use centralized HTTP client for file upload
-      const response = await HttpClient.uploadFile('/api/generate-summary/summary', formData);
+      const response = await HttpClient.uploadFile(
+        "/api/generate-summary/summary",
+        formData,
+      );
       const result = await HttpClient.parseJsonResponse<{
         summary?: string;
         keyPoints?: string[];

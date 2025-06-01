@@ -66,8 +66,11 @@ export function useAgentProgress(
       setIsLoading(true);
       setError(null);
 
-      const response = await HttpClient.get(API_CONFIG.endpoints.agents.progress(sessionId));
-      const data = await HttpClient.parseJsonResponse<AgentProgressResponse>(response);
+      const response = await HttpClient.get(
+        API_CONFIG.endpoints.agents.progress(sessionId),
+      );
+      const data =
+        await HttpClient.parseJsonResponse<AgentProgressResponse>(response);
 
       setProgress(data.progress);
       setStatus(data.status);

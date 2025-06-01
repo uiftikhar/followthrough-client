@@ -2,10 +2,30 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GoogleOAuthService, GoogleConnectionStatus } from "@/lib/api/google-oauth-service";
-import { Mail, Calendar, Video, Shield, CheckCircle2, AlertCircle, RefreshCw, TestTube } from "lucide-react";
+import {
+  GoogleOAuthService,
+  GoogleConnectionStatus,
+} from "@/lib/api/google-oauth-service";
+import {
+  Mail,
+  Calendar,
+  Video,
+  Shield,
+  CheckCircle2,
+  AlertCircle,
+  RefreshCw,
+  TestTube,
+} from "lucide-react";
+import { WatchInfo } from "@/lib/api/gmail-notifications-service";
+import { HttpClient } from "@/lib/api/http-client";
 
 interface GoogleAuthButtonProps {
   onAuthSuccess?: () => void;
@@ -19,7 +39,7 @@ export function GoogleAuthButton({
   const [isLoading, setIsLoading] = useState(false);
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
   const [status, setStatus] = useState<GoogleConnectionStatus>({
-    isConnected: false
+    isConnected: false,
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -32,18 +52,20 @@ export function GoogleAuthButton({
     try {
       const isAuth = await GoogleOAuthService.isAuthenticated();
       setIsUserAuthenticated(isAuth);
-      
+
       if (!isAuth) {
-        setError('Please log in first to connect Google services');
+        setError("Please log in first to connect Google services");
         return;
       }
 
-      const connectionStatus = await GoogleOAuthService.getGoogleConnectionStatus();
+      const connectionStatus =
+        await GoogleOAuthService.getGoogleConnectionStatus();
       setStatus(connectionStatus);
       setError(null);
     } catch (error) {
-      console.error('Failed to load Google connection status:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("Failed to load Google connection status:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       setError(errorMessage);
       setIsUserAuthenticated(false);
     }
@@ -53,41 +75,43 @@ export function GoogleAuthButton({
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const isAuth = await GoogleOAuthService.isAuthenticated();
       if (!isAuth) {
-        throw new Error('Please log in first to connect Google services');
+        throw new Error("Please log in first to connect Google services");
       }
-      
+
       // This will redirect to Google OAuth via our server
       await GoogleOAuthService.initiateGoogleOAuth();
-      
+
     } catch (error) {
-      console.error('Failed to initiate Google authorization:', error);
+      console.error("Failed to initiate Google authorization:", error);
       setIsLoading(false);
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       setError(errorMessage);
       onAuthError?.(errorMessage);
     }
   };
 
+ 
   const handleRevoke = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const success = await GoogleOAuthService.revokeGoogleAccess();
-      
+
       if (success) {
         setStatus({ isConnected: false });
         onAuthSuccess?.();
       } else {
-        throw new Error('Failed to revoke Google access');
+        throw new Error("Failed to revoke Google access");
       }
-      
     } catch (error) {
-      console.error('Failed to revoke Google authorization:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("Failed to revoke Google authorization:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       setError(errorMessage);
       onAuthError?.(errorMessage);
     } finally {
@@ -99,23 +123,23 @@ export function GoogleAuthButton({
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const testResult = await GoogleOAuthService.testGoogleConnection();
-      
+
       if (testResult.success) {
         alert(
           `Google connection works!\n\n` +
-          `Email: ${testResult.testResult?.email}\n` +
-          `Name: ${testResult.testResult?.name}\n` +
-          `Verified: ${testResult.testResult?.verified ? 'Yes' : 'No'}`
+            `Email: ${testResult.testResult?.email}\n` +
+            `Name: ${testResult.testResult?.name}\n` +
+            `Verified: ${testResult.testResult?.verified ? "Yes" : "No"}`,
         );
       } else {
-        throw new Error(testResult.message || 'Connection test failed');
+        throw new Error(testResult.message || "Connection test failed");
       }
-      
     } catch (error) {
-      console.error('Connection test failed:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("Connection test failed:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -126,13 +150,13 @@ export function GoogleAuthButton({
     try {
       setIsLoading(true);
       setError(null);
-      
+
       await GoogleOAuthService.refreshTokens();
       await loadConnectionStatus(); // Reload status after refresh
-      
     } catch (error) {
-      console.error('Failed to refresh tokens:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("Failed to refresh tokens:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -146,7 +170,9 @@ export function GoogleAuthButton({
         <CardHeader>
           <div className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-red-600" />
-            <CardTitle className="text-lg text-red-800">Google Auth Error</CardTitle>
+            <CardTitle className="text-lg text-red-800">
+              Google Auth Error
+            </CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -166,7 +192,7 @@ export function GoogleAuthButton({
             </Button>
             {!isUserAuthenticated ? (
               <Button
-                onClick={() => window.location.href = '/auth/login'}
+                onClick={() => (window.location.href = "/auth/login")}
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 Log In
@@ -194,9 +220,14 @@ export function GoogleAuthButton({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-green-600" />
-              <CardTitle className="text-lg text-green-800">Google Services Connected</CardTitle>
+              <CardTitle className="text-lg text-green-800">
+                Google Services Connected
+              </CardTitle>
             </div>
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+            <Badge
+              variant="outline"
+              className="bg-green-50 text-green-700 border-green-200"
+            >
               Active
             </Badge>
           </div>
@@ -222,14 +253,16 @@ export function GoogleAuthButton({
             </div>
             <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 border border-green-200">
               <Calendar className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium text-green-900">Calendar</span>
+              <span className="text-sm font-medium text-green-900">
+                Calendar
+              </span>
             </div>
             <div className="flex items-center gap-2 p-3 rounded-lg bg-purple-50 border border-purple-200">
               <Video className="h-4 w-4 text-purple-600" />
               <span className="text-sm font-medium text-purple-900">Meet</span>
             </div>
           </div>
-          
+
           <div className="flex gap-2 flex-wrap">
             <Button
               variant="outline"
@@ -272,7 +305,8 @@ export function GoogleAuthButton({
           <CardTitle className="text-lg">Authorize Google Access</CardTitle>
         </div>
         <CardDescription>
-          Connect your Google account to enable Gmail, Calendar, and Meet integration
+          Connect your Google account to enable Gmail, Calendar, and Meet
+          integration
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -302,27 +336,33 @@ export function GoogleAuthButton({
             <div className="text-sm text-blue-800">
               <p className="font-medium">Secure Server-Side Authentication</p>
               <p className="mt-1">
-                All OAuth tokens are securely stored on our server. 
-                Your credentials never leave our secure environment.
+                All OAuth tokens are securely stored on our server. Your
+                credentials never leave our secure environment.
               </p>
             </div>
           </div>
         </div>
 
         <Button
-          onClick={handleAuthorize}
+          onClick={() => {
+            handleAuthorize();
+          }}
           disabled={isLoading || !isUserAuthenticated}
           className="w-full bg-blue-600 hover:bg-blue-700"
         >
           {isLoading ? "Connecting..." : "Authorize Google Access"}
         </Button>
-        
+
         {!isUserAuthenticated && (
           <p className="text-sm text-gray-500 text-center">
-            Please <a href="/auth/login" className="text-blue-600 underline">log in</a> first to connect Google services
+            Please{" "}
+            <a href="/auth/login" className="text-blue-600 underline">
+              log in
+            </a>{" "}
+            first to connect Google services
           </p>
         )}
       </CardContent>
     </Card>
   );
-} 
+}

@@ -362,7 +362,9 @@ export default function AgentVisualization({
 
       console.log("Fetching initial graph data...");
 
-      const response = await HttpClient.get(`/meeting-analysis/${sessionId}/visualization`);
+      const response = await HttpClient.get(
+        `/meeting-analysis/${sessionId}/visualization`,
+      );
       const data = await HttpClient.parseJsonResponse(response);
       processGraphUpdate(data);
       setHasInitialData(true);

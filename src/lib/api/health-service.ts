@@ -63,7 +63,9 @@ export const HealthService = {
    */
   async checkDetailedHealth(): Promise<DetailedHealthStatus> {
     try {
-      const response = await HttpClient.get(API_CONFIG.endpoints.health.detailed);
+      const response = await HttpClient.get(
+        API_CONFIG.endpoints.health.detailed,
+      );
       return await HttpClient.parseJsonResponse<DetailedHealthStatus>(response);
     } catch (error) {
       console.error("Detailed health check failed:", error);
@@ -82,8 +84,12 @@ export const HealthService = {
    */
   async checkServiceStatus(): Promise<ServiceStatusResponse> {
     try {
-      const response = await HttpClient.get(API_CONFIG.endpoints.health.serviceStatus);
-      return await HttpClient.parseJsonResponse<ServiceStatusResponse>(response);
+      const response = await HttpClient.get(
+        API_CONFIG.endpoints.health.serviceStatus,
+      );
+      return await HttpClient.parseJsonResponse<ServiceStatusResponse>(
+        response,
+      );
     } catch (error) {
       console.error("Service status check failed:", error);
       return {

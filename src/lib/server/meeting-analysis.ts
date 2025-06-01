@@ -40,7 +40,6 @@ export async function getMeetingAnalysisResults(
       );
     }
 
-    
     return response.json();
   } catch (error) {
     console.error("Error fetching meeting analysis:", error);

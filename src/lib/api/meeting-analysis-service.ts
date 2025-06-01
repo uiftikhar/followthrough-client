@@ -28,7 +28,7 @@ const logAvailableCookies = () => {
     console.log("Available cookies:", cookies);
 
     // Check specifically for auth token
-    const authToken = Cookies.get("auth_token");
+    const authToken = Cookies.get("jwt_token");
     console.log("Found auth token in cookies:", !!authToken);
   } catch (e) {
     console.log("Cannot log cookies - likely server-side rendering");
@@ -47,16 +47,21 @@ export const MeetingAnalysisService = {
       logAvailableCookies();
 
       console.log("Using centralized HTTP client for analysis");
-      
-      const response = await HttpClient.post('/api/meeting-analysis', data);
-      const result = await HttpClient.parseJsonResponse<{ sessionId: string }>(response);
+
+      const response = await HttpClient.post("/api/meeting-analysis", data);
+      const result = await HttpClient.parseJsonResponse<{ sessionId: string }>(
+        response,
+      );
 
       return result;
     } catch (error) {
       console.error("Analyze transcript error:", error);
 
       // Handle authentication errors
-      if (error instanceof Error && error.message.includes('Authentication expired')) {
+      if (
+        error instanceof Error &&
+        error.message.includes("Authentication expired")
+      ) {
         console.error("Authentication error: Token invalid or expired");
         AuthService.clearToken(); // Clear invalid token
       }
@@ -78,7 +83,8 @@ export const MeetingAnalysisService = {
       logAvailableCookies();
 
       const response = await HttpClient.get(`/meeting-analysis/${sessionId}`);
-      const result = await HttpClient.parseJsonResponse<MeetingAnalysisResponse>(response);
+      const result =
+        await HttpClient.parseJsonResponse<MeetingAnalysisResponse>(response);
 
       console.log("Results response received successfully");
       return result;
@@ -86,7 +92,10 @@ export const MeetingAnalysisService = {
       console.error("Get analysis results error:", error);
 
       // Handle authentication errors
-      if (error instanceof Error && error.message.includes('Authentication expired')) {
+      if (
+        error instanceof Error &&
+        error.message.includes("Authentication expired")
+      ) {
         console.error("Authentication error: Token invalid or expired");
         AuthService.clearToken(); // Clear invalid token
       }
@@ -99,7 +108,7 @@ export const MeetingAnalysisService = {
   getWebSocketUrl(sessionId: string): string {
     // Use the wsBaseUrl from API_CONFIG which handles browser context properly
     const wsUrl = API_CONFIG.wsBaseUrl;
-    const token = AuthService.getToken();
+    const token = AuthService.getToken(); // This now returns jwt_token
     console.log(
       `Creating WebSocket URL for session ${sessionId} using base ${wsUrl}`,
     );
