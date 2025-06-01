@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -31,9 +31,10 @@ import {
   type OAuthStatus,
 } from "@/lib/api/gmail-auth-service";
 import {
-  useGmailTriage,
-  type TriageNotification,
-} from "@/hooks/useGmailTriage";
+  getWebSocketClient,
+  type WebSocketClient,
+  type ConnectionState,
+} from "@/lib/api/websocket-client";
 import {
   Bell,
   BellOff,
@@ -59,6 +60,18 @@ interface GmailNotificationsButtonProps {
   onError?: (error: string) => void;
 }
 
+/**
+ * Email notification from WebSocket
+ */
+interface EmailNotification {
+  id: string;
+  type: string;
+  emailId: string;
+  emailAddress: string;
+  summary: string;
+  timestamp: Date;
+}
+
 export function GmailNotificationsButton({
   onStatusChange,
   onError,
@@ -72,27 +85,22 @@ export function GmailNotificationsButton({
   const [error, setError] = useState<string | null>(null);
   const [setupEmailNotifications, onSetSetupEmailNotifications] = useState<boolean>(false);
 
+  // WebSocket state
+  const [connectionState, setConnectionState] = useState<ConnectionState>("disconnected");
+  const [isLoading, setIsLoading] = useState(false);
+  const [notifications, setNotifications] = useState<EmailNotification[]>([]);
+  const [latestNotification, setLatestNotification] = useState<EmailNotification | null>(null);
+
   // Configuration state
   const [labelIds, setLabelIds] = useState<string>("");
 
-  // Use Gmail Triage hook for WebSocket functionality
-  const {
-    isAuthenticated,
-    connectionState,
-    authStatus,
-    notifications: triageNotifications,
-    latestNotification,
-    setupNotifications: triageSetupNotifications,
-    connect,
-    disconnect,
-    isLoading: triageLoading,
-    error: triageError,
-  } = useGmailTriage({ autoConnect: false });
+  // Refs
+  const wsClientRef = useRef<WebSocketClient | null>(null);
 
   // Derived state
   const notificationsEnabled = status.isEnabled;
   const isConnected = connectionState === "connected";
-  const isLoading = triageLoading;
+  const isAuthenticated = GmailAuthService.isAuthenticated();
 
   useEffect(() => {
     loadStatus();
@@ -103,9 +111,106 @@ export function GmailNotificationsButton({
   // Auto-connect to WebSocket when notifications are enabled
   useEffect(() => {
     if (notificationsEnabled && isAuthenticated && connectionState === "disconnected") {
-      connect().catch(console.error);
+      connectWebSocket().catch(console.error);
     }
-  }, [notificationsEnabled, isAuthenticated, connectionState, connect]);
+  }, [notificationsEnabled, isAuthenticated, connectionState]);
+
+  const setupWebSocketListeners = useCallback((client: WebSocketClient) => {
+    // Connection events
+    client.on("connected", () => {
+      setConnectionState("connected");
+      setError(null);
+      console.log("✅ WebSocket connected");
+    });
+
+    client.on("disconnected", () => {
+      setConnectionState("disconnected");
+      console.log("❌ WebSocket disconnected");
+    });
+
+    client.on("error", (data: { error: string }) => {
+      setConnectionState("error");
+      setError(`WebSocket error: ${data.error}`);
+      console.error("WebSocket error:", data.error);
+    });
+
+    // Email notification events
+    client.on("notification", (data: any) => {
+      console.log("📧 Notification received:", data);
+      
+      if (data.type === "email_received") {
+        const notification: EmailNotification = {
+          id: `email-${data.emailId}-${Date.now()}`,
+          type: data.type,
+          emailId: data.emailId,
+          emailAddress: data.emailAddress,
+          summary: data.summary,
+          timestamp: new Date(data.timestamp),
+        };
+
+        setNotifications((prev) => [notification, ...prev]);
+        setLatestNotification(notification);
+        console.log("📬 Email notification added:", notification);
+      }
+    });
+
+    client.on("max_reconnect_reached", () => {
+      setError("Maximum reconnection attempts reached");
+      console.error("Max reconnection attempts reached");
+    });
+  }, []);
+
+  const connectWebSocket = useCallback(async () => {
+    if (!isAuthenticated) {
+      throw new Error("User must be authenticated to connect");
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      setConnectionState("connecting");
+
+      const client = getWebSocketClient({
+        debug: true,
+        maxReconnectAttempts: 5,
+        reconnectInterval: 3000,
+      });
+
+      // Make sure the WebSocket client has the current JWT token
+      const token = GmailAuthService.getToken();
+      if (token) {
+        client.setToken(token);
+      }
+
+      setupWebSocketListeners(client);
+
+      await client.connect();
+
+      // Subscribe to notifications
+      const userIdFromToken = GmailAuthService.getUserIdFromToken();
+      if (userIdFromToken) {
+        client.subscribe({
+          userId: userIdFromToken,
+        });
+      }
+
+      wsClientRef.current = client;
+    } catch (error) {
+      setConnectionState("error");
+      setError(error instanceof Error ? error.message : "Failed to connect");
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated, setupWebSocketListeners]);
+
+  const disconnectWebSocket = useCallback(() => {
+    if (wsClientRef.current) {
+      wsClientRef.current.disconnect();
+      wsClientRef.current = null;
+    }
+    setConnectionState("disconnected");
+  }, []);
 
   const loadStatus = async () => {
     try {
@@ -149,12 +254,19 @@ export function GmailNotificationsButton({
         setupOptions.labelIds = labelIds.split(",").map((id) => id.trim());
       }
 
-      // Use the triage hook's setup function which handles WebSocket connection
-      await triageSetupNotifications();
-      
-      // Reload status after setup
-      await loadStatus();
-      await loadHealth();
+      const result = await GmailNotificationsService.setupNotifications(setupOptions);
+
+      if (result.success) {
+        await loadStatus();
+        await loadHealth();
+        
+        // Connect WebSocket after successful setup
+        if (isAuthenticated) {
+          await connectWebSocket();
+        }
+      } else {
+        throw new Error(result.error || result.message || "Failed to setup notifications");
+      }
     } catch (error) {
       console.error("Failed to setup notifications:", error);
       const errorMessage =
@@ -169,7 +281,7 @@ export function GmailNotificationsButton({
       setError(null);
 
       // Disconnect WebSocket first
-      disconnect();
+      disconnectWebSocket();
 
       const result = await GmailNotificationsService.disableNotifications();
 
@@ -278,7 +390,6 @@ export function GmailNotificationsButton({
     }
   };
 
-
   const refreshAll = async () => {
     try {
       await Promise.all([
@@ -292,8 +403,7 @@ export function GmailNotificationsButton({
   };
 
   // Show error state
-  if (error || triageError) {
-    const displayError = error || triageError;
+  if (error) {
     return (
       <Card className="w-full border-red-200">
         <CardHeader>
@@ -306,7 +416,7 @@ export function GmailNotificationsButton({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-            <p className="text-red-800 text-sm">{displayError}</p>
+            <p className="text-red-800 text-sm">{error}</p>
           </div>
           <div className="flex gap-2">
             <Button
@@ -395,11 +505,6 @@ export function GmailNotificationsButton({
         </div>
         <CardDescription>
           Real-time email notifications via Google Pub/Sub with WebSocket
-          {authStatus?.oauth.userInfo?.googleEmail && (
-            <span className="block mt-1 font-medium text-sm">
-              Connected: {authStatus.oauth.userInfo.googleEmail}
-            </span>
-          )}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -447,7 +552,7 @@ export function GmailNotificationsButton({
                   </div>
                 )}
 
-                {isConnected && triageNotifications.length > 0 && (
+                {isConnected && notifications.length > 0 && (
                   <div className="p-3 rounded-lg bg-green-50 border border-green-200">
                     <div className="flex items-center gap-2">
                       <Activity className="h-4 w-4 text-green-600" />
@@ -456,7 +561,7 @@ export function GmailNotificationsButton({
                       </span>
                     </div>
                     <p className="text-xs text-green-700 mt-1">
-                      {triageNotifications.length} notifications received
+                      {notifications.length} email notifications received
                     </p>
                   </div>
                 )}
@@ -496,7 +601,7 @@ export function GmailNotificationsButton({
                 {notificationsEnabled && !isConnected && (
                   <Button
                     variant="outline"
-                    onClick={connect}
+                    onClick={connectWebSocket}
                     disabled={isLoading}
                     className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
                   >
@@ -716,58 +821,40 @@ export function GmailNotificationsButton({
           <TabsContent value="notifications" className="space-y-4">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="font-medium">Real-time Notifications</h4>
+                <h4 className="font-medium">Real-time Email Notifications</h4>
                 <Badge variant="outline">
-                  {triageNotifications.length} total
+                  {notifications.length} total
                 </Badge>
               </div>
 
-              {triageNotifications.length === 0 ? (
+              {notifications.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                  <Bell className="h-8 w-8 mx-auto mb-2" />
-                  <p>No notifications yet.</p>
-                  <p className="text-sm">Enable push notifications to see real-time updates!</p>
+                  <Mail className="h-8 w-8 mx-auto mb-2" />
+                  <p>No email notifications yet.</p>
+                  <p className="text-sm">Enable push notifications to see real-time email updates!</p>
                 </div>
               ) : (
                 <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {triageNotifications.slice(0, 10).map((notification) => (
+                  {notifications.slice(0, 20).map((notification) => (
                     <div key={notification.id} className="border rounded-lg p-3">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          {notification.type === "started" && (
-                            <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
-                          )}
-                          {notification.type === "completed" && (
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
-                          )}
-                          {notification.type === "failed" && (
-                            <AlertCircle className="h-4 w-4 text-red-500" />
-                          )}
+                          <Mail className="h-4 w-4 text-blue-500" />
                           <span className="font-medium text-sm">
                             {notification.emailAddress}
                           </span>
                         </div>
-                        <Badge
-                          variant={
-                            notification.type === "completed"
-                              ? "default"
-                              : notification.type === "failed"
-                              ? "destructive"
-                              : "secondary"
-                          }
-                        >
+                        <Badge variant="default" className="bg-blue-500">
                           {notification.type}
                         </Badge>
                       </div>
-                      <div className="text-xs text-gray-600">
-                        {notification.timestamp.toLocaleString()}
+                      <div className="text-sm text-gray-700 mb-2">
+                        {notification.summary}
                       </div>
-                      {notification.result && (
-                        <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
-                          <strong>Priority:</strong> {notification.result.classification.priority} |{" "}
-                          <strong>Category:</strong> {notification.result.classification.category}
-                        </div>
-                      )}
+                      <div className="flex justify-between items-center text-xs text-gray-500">
+                        <span>Email ID: {notification.emailId}</span>
+                        <span>{notification.timestamp.toLocaleString()}</span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -790,30 +877,20 @@ export function GmailNotificationsButton({
                 </p>
               </div>
 
-              {authStatus?.oauth?.userInfo && (
-                <div className="p-3 rounded-lg bg-green-50 border border-green-200">
-                  <h4 className="font-medium text-sm text-green-800 mb-2">
-                    Connected Account
-                  </h4>
-                  <div className="flex items-center gap-3">
-                    {authStatus.oauth.userInfo.googlePicture && (
-                      <img
-                        src={authStatus.oauth.userInfo.googlePicture}
-                        alt="Profile"
-                        className="w-8 h-8 rounded-full"
-                      />
-                    )}
-                    <div>
-                      <div className="text-sm font-medium">
-                        {authStatus.oauth.userInfo.googleName}
-                      </div>
-                      <div className="text-xs text-gray-600">
-                        {authStatus.oauth.userInfo.googleEmail}
-                      </div>
-                    </div>
-                  </div>
+              <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
+                <h4 className="font-medium text-sm text-blue-800 mb-2">
+                  WebSocket Connection
+                </h4>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Status: {connectionState}</span>
+                  {getConnectionBadge()}
                 </div>
-              )}
+                {isConnected && (
+                  <div className="text-xs text-gray-600 mt-1">
+                    Listening for email_received notifications
+                  </div>
+                )}
+              </div>
             </div>
           </TabsContent>
         </Tabs>
