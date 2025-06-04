@@ -23,7 +23,7 @@ export async function getMeetingAnalysisResults(
 
   try {
     const response = await fetch(
-      `${API_CONFIG.baseUrl}/rag-meeting-analysis/${sessionId}`,
+      `${API_CONFIG.baseUrl}/api/meeting-analysis/${sessionId}`,
       {
         method: "GET",
         headers,

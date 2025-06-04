@@ -1,9 +1,6 @@
-import axios from "axios";
+import { HttpClient } from "./http-client";
 import Cookies from "js-cookie";
 import { API_CONFIG } from "@/config/api";
-
-// Use the API_CONFIG which now properly handles browser vs server context
-const API_URL = API_CONFIG.baseUrl;
 
 // Cookie settings for better security
 const COOKIE_OPTIONS = {
@@ -39,16 +36,15 @@ interface AuthResponse {
 export const AuthService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      console.log("Attempting login with API URL:", API_URL);
-      const response = await axios.post(`${API_URL}/auth/login`, credentials, {
-        withCredentials: true,
-      });
+      console.log("Attempting login with centralized HTTP client");
+      const response = await HttpClient.post("/auth/login", credentials, false);
+      const data = await HttpClient.parseJsonResponse<AuthResponse>(response);
 
       // Store tokens in both localStorage and cookies for client/server sync
-      this.setToken(response.data.accessToken);
-      this.setRefreshToken(response.data.refreshToken);
+      this.setToken(data.accessToken);
+      this.setRefreshToken(data.refreshToken);
 
-      return response.data;
+      return data;
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -57,19 +53,18 @@ export const AuthService = {
 
   async signup(credentials: SignUpCredentials): Promise<AuthResponse> {
     try {
-      const response = await axios.post(
-        `${API_URL}/auth/register`,
+      const response = await HttpClient.post(
+        "/auth/register",
         credentials,
-        {
-          withCredentials: true,
-        },
+        false,
       );
+      const data = await HttpClient.parseJsonResponse<AuthResponse>(response);
 
       // Store tokens in both localStorage and cookies
-      this.setToken(response.data.accessToken);
-      this.setRefreshToken(response.data.refreshToken);
+      this.setToken(data.accessToken);
+      this.setRefreshToken(data.refreshToken);
 
-      return response.data;
+      return data;
     } catch (error) {
       console.error("Signup error:", error);
       throw error;
@@ -78,13 +73,7 @@ export const AuthService = {
 
   async logout(): Promise<void> {
     try {
-      await axios.post(
-        `${API_URL}/auth/logout`,
-        {},
-        {
-          withCredentials: true,
-        },
-      );
+      await HttpClient.post("/auth/logout", {}, true);
       this.clearToken();
     } catch (error) {
       console.error("Logout error:", error);
@@ -96,19 +85,18 @@ export const AuthService = {
   async refreshToken(): Promise<AuthResponse> {
     try {
       const refreshToken = this.getRefreshToken();
-      const response = await axios.post(
-        `${API_URL}/auth/refresh`,
+      const response = await HttpClient.post(
+        "/auth/refresh",
         { refreshToken },
-        {
-          withCredentials: true,
-        },
+        false,
       );
+      const data = await HttpClient.parseJsonResponse<AuthResponse>(response);
 
       // Update stored tokens
-      this.setToken(response.data.accessToken);
-      this.setRefreshToken(response.data.refreshToken);
+      this.setToken(data.accessToken);
+      this.setRefreshToken(data.refreshToken);
 
-      return response.data;
+      return data;
     } catch (error) {
       console.error("Token refresh error:", error);
       throw error;
@@ -117,7 +105,7 @@ export const AuthService = {
 
   getToken(): string | null {
     return (
-      localStorage.getItem("auth_token") || Cookies.get("auth_token") || null
+      localStorage.getItem("jwt_token") || Cookies.get("jwt_token") || null
     );
   },
 
@@ -130,11 +118,11 @@ export const AuthService = {
   },
 
   setToken(token: string): void {
-    localStorage.setItem("auth_token", token);
-    Cookies.set("auth_token", token, COOKIE_OPTIONS);
+    localStorage.setItem("jwt_token", token);
+    Cookies.set("jwt_token", token, COOKIE_OPTIONS);
 
     // Also set in document.cookie for server components to access
-    document.cookie = `auth_token=${token}; path=/; ${COOKIE_OPTIONS.secure ? "secure; " : ""}samesite=${COOKIE_OPTIONS.sameSite}; max-age=${60 * 60 * 24 * COOKIE_OPTIONS.expires}`;
+    document.cookie = `jwt_token=${token}; path=/; ${COOKIE_OPTIONS.secure ? "secure; " : ""}samesite=${COOKIE_OPTIONS.sameSite}; max-age=${60 * 60 * 24 * COOKIE_OPTIONS.expires}`;
   },
 
   setRefreshToken(token: string): void {
@@ -147,14 +135,14 @@ export const AuthService = {
   },
 
   clearToken(): void {
-    localStorage.removeItem("auth_token");
+    localStorage.removeItem("jwt_token");
     localStorage.removeItem("refresh_token");
-    Cookies.remove("auth_token");
+    Cookies.remove("jwt_token");
     Cookies.remove("refresh_token");
 
     // For server components to know tokens were cleared
     document.cookie =
-      "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      "jwt_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     document.cookie =
       "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
   },

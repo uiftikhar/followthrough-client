@@ -9,7 +9,7 @@ const authPages = ["/auth/login", "/auth/register"];
 
 export function middleware(request: NextRequest) {
   // Get the auth token from cookies
-  const authToken = request.cookies.get("auth_token")?.value;
+  const authToken = request.cookies.get("jwt_token")?.value;
 
   // Check if the path is a public route
   const isPublicRoute = publicRoutes.some(

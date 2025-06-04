@@ -3,7 +3,7 @@
  *
  * Provides methods to check system health and service status
  */
-import { fetchWithAuth } from "../utils/auth-fetch";
+import { HttpClient } from "./http-client";
 import { API_CONFIG } from "../../config/api";
 
 /**
@@ -50,15 +50,8 @@ export const HealthService = {
    */
   async checkHealth(): Promise<HealthStatus> {
     try {
-      const response = await fetchWithAuth(
-        `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.health.base}`,
-      );
-
-      if (!response.ok) {
-        return { status: "ERROR" };
-      }
-
-      return await response.json();
+      const response = await HttpClient.get(API_CONFIG.endpoints.health.base);
+      return await HttpClient.parseJsonResponse<HealthStatus>(response);
     } catch (error) {
       console.error("Health check failed:", error);
       return { status: "ERROR" };
@@ -70,21 +63,10 @@ export const HealthService = {
    */
   async checkDetailedHealth(): Promise<DetailedHealthStatus> {
     try {
-      const response = await fetchWithAuth(
-        `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.health.detailed}`,
+      const response = await HttpClient.get(
+        API_CONFIG.endpoints.health.detailed,
       );
-
-      if (!response.ok) {
-        return {
-          status: "ERROR",
-          uptime: 0,
-          env: "unknown",
-          memory: {},
-          cpu: {},
-        };
-      }
-
-      return await response.json();
+      return await HttpClient.parseJsonResponse<DetailedHealthStatus>(response);
     } catch (error) {
       console.error("Detailed health check failed:", error);
       return {
@@ -102,18 +84,12 @@ export const HealthService = {
    */
   async checkServiceStatus(): Promise<ServiceStatusResponse> {
     try {
-      const response = await fetchWithAuth(
-        `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.health.serviceStatus}`,
+      const response = await HttpClient.get(
+        API_CONFIG.endpoints.health.serviceStatus,
       );
-
-      if (!response.ok) {
-        return {
-          status: "ERROR",
-          services: [],
-        };
-      }
-
-      return await response.json();
+      return await HttpClient.parseJsonResponse<ServiceStatusResponse>(
+        response,
+      );
     } catch (error) {
       console.error("Service status check failed:", error);
       return {

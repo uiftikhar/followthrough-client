@@ -1,9 +1,10 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import axios from "axios";
+import { HttpClient } from "./api/http-client";
 
 // API URL for auth endpoints
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const API_URL = "https://ffdf-2-201-41-78.ngrok-free.app";
+// const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -19,27 +20,30 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          // Call our backend API for authentication
-          const response = await axios.post(
-            `${API_URL}/auth/login`,
+          // Call our backend API for authentication using the centralized HTTP client
+          const response = await HttpClient.post(
+            "/auth/login",
             {
               email: credentials.email,
               password: credentials.password,
             },
-            {
-              withCredentials: true,
-              headers: {
-                "Content-Type": "application/json",
-              },
-            },
-          );
+            false,
+          ); // false = no authentication required for login
+
+          const data = await HttpClient.parseJsonResponse<{
+            user: {
+              id: string;
+              email: string;
+              role: string;
+            };
+          }>(response);
 
           // Return the user object if successful
-          if (response.data.user) {
+          if (data.user) {
             return {
-              id: response.data.user.id,
-              email: response.data.user.email,
-              role: response.data.user.role,
+              id: data.user.id,
+              email: data.user.email,
+              role: data.user.role,
             };
           }
 

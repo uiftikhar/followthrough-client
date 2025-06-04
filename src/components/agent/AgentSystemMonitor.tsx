@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { API_CONFIG } from "../../config/api";
-import { fetchWithAuth } from "../../lib/utils/auth-fetch";
+import { HttpClient } from "../../lib/api/http-client";
 
 /**
  * Agent service status
@@ -70,15 +70,9 @@ export default function AgentSystemMonitor({
       setLoading(true);
       setError(null);
 
-      const response = await fetchWithAuth(
-        `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.agents.status}`,
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch agent system status");
-      }
-
-      const data: AgentStatusReport = await response.json();
+      const response = await HttpClient.get(API_CONFIG.endpoints.agents.status);
+      const data =
+        await HttpClient.parseJsonResponse<AgentStatusReport>(response);
       setStatusReport(data);
     } catch (err) {
       console.error("Error fetching agent status:", err);

@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import { HttpClient } from "./http-client";
 import { AuthService } from "./auth-service";
 import {
   AnalysisResult,
@@ -6,9 +6,6 @@ import {
 } from "@/types/meeting-analysis";
 import Cookies from "js-cookie";
 import { API_CONFIG } from "@/config/api";
-
-// Use the API_CONFIG which now properly handles browser vs server context
-const API_URL = API_CONFIG.baseUrl;
 
 export interface AnalyzeTranscriptRequest {
   transcript: string;
@@ -23,18 +20,6 @@ export interface AnalyzeTranscriptRequest {
 // Re-export the types for convenience
 export type { AnalysisResult, MeetingAnalysisResponse };
 
-// Helper to get auth headers with the right token
-const getAuthHeaders = () => {
-  const token = AuthService.getToken();
-  return {
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    withCredentials: true, // Important for cookies-based auth
-  };
-};
-
 // Helper to check all available cookies
 const logAvailableCookies = () => {
   try {
@@ -43,7 +28,7 @@ const logAvailableCookies = () => {
     console.log("Available cookies:", cookies);
 
     // Check specifically for auth token
-    const authToken = Cookies.get("auth_token");
+    const authToken = Cookies.get("jwt_token");
     console.log("Found auth token in cookies:", !!authToken);
   } catch (e) {
     console.log("Cannot log cookies - likely server-side rendering");
@@ -61,23 +46,22 @@ export const MeetingAnalysisService = {
     try {
       logAvailableCookies();
 
-      const authConfig = getAuthHeaders();
-      console.log("Using API URL:", API_URL);
+      console.log("Using centralized HTTP client for analysis");
 
-      const response = await axios.post(
-        `${API_URL}/rag-meeting-analysis`,
-        data,
-        authConfig,
+      const response = await HttpClient.post("/api/meeting-analysis", data);
+      const result = await HttpClient.parseJsonResponse<{ sessionId: string }>(
+        response,
       );
 
-      return {
-        sessionId: response.data.sessionId,
-      };
+      return result;
     } catch (error) {
       console.error("Analyze transcript error:", error);
 
       // Handle authentication errors
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
+      if (
+        error instanceof Error &&
+        error.message.includes("Authentication expired")
+      ) {
         console.error("Authentication error: Token invalid or expired");
         AuthService.clearToken(); // Clear invalid token
       }
@@ -90,51 +74,30 @@ export const MeetingAnalysisService = {
     sessionId: string,
   ): Promise<MeetingAnalysisResponse> {
     try {
-      // Get a fresh set of headers (to ensure token sync)
-      const authConfig = getAuthHeaders();
-
       console.log(
-        `Fetching analysis results from ${API_URL}/rag-meeting-analysis/${sessionId}`,
+        `Fetching analysis results for session ${sessionId} using centralized HTTP client`,
       );
       console.log(`Auth token exists: ${!!AuthService.getToken()}`);
-      console.log(`Auth headers:`, JSON.stringify(authConfig.headers));
 
       // Check document cookies for debugging
       logAvailableCookies();
 
-      const response = await axios.get(
-        `${API_URL}/rag-meeting-analysis/${sessionId}`,
-        authConfig,
-      );
+      const response = await HttpClient.get(`/meeting-analysis/${sessionId}`);
+      const result =
+        await HttpClient.parseJsonResponse<MeetingAnalysisResponse>(response);
 
-      console.log("Results response status:", response.status);
-      return response.data;
+      console.log("Results response received successfully");
+      return result;
     } catch (error: unknown) {
       console.error("Get analysis results error:", error);
 
-      // Properly type the error as AxiosError for TypeScript
-      if (axios.isAxiosError(error)) {
-        const axiosError = error as AxiosError;
-
-        // Handle authentication errors
-        if (axiosError.response?.status === 401) {
-          console.error("Authentication error: Token invalid or expired");
-          AuthService.clearToken(); // Clear invalid token
-        }
-
-        // Provide better error message if available
-        if (axiosError.response?.data) {
-          console.error("Server error details:", axiosError.response.data);
-        }
-
-        // Log request details
-        if (axiosError.config) {
-          console.error("Failed request details:", {
-            url: axiosError.config.url,
-            method: axiosError.config.method,
-            headers: axiosError.config.headers,
-          });
-        }
+      // Handle authentication errors
+      if (
+        error instanceof Error &&
+        error.message.includes("Authentication expired")
+      ) {
+        console.error("Authentication error: Token invalid or expired");
+        AuthService.clearToken(); // Clear invalid token
       }
 
       throw error;
@@ -145,7 +108,7 @@ export const MeetingAnalysisService = {
   getWebSocketUrl(sessionId: string): string {
     // Use the wsBaseUrl from API_CONFIG which handles browser context properly
     const wsUrl = API_CONFIG.wsBaseUrl;
-    const token = AuthService.getToken();
+    const token = AuthService.getToken(); // This now returns jwt_token
     console.log(
       `Creating WebSocket URL for session ${sessionId} using base ${wsUrl}`,
     );

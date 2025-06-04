@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
 import { API_CONFIG } from "@/config/api";
+import { HttpClient } from "@/lib/api/http-client";
 
 // Custom node components
 function DefaultNode({ data }: { data: any }) {
@@ -359,18 +360,12 @@ export default function AgentVisualization({
       setIsLoading(true);
       setError(null);
 
-      // Use the server API URL for HTTP requests too
-      const apiHost = process.env.NEXT_PUBLIC_API_HOST || "localhost:3000";
-      const apiUrl = `http://${apiHost}${API_CONFIG.endpoints.visualizations.graph(sessionId)}`;
-      console.log("Fetching graph data from:", apiUrl);
+      console.log("Fetching initial graph data...");
 
-      const response = await fetch(apiUrl);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch graph data");
-      }
-
-      const data = await response.json();
+      const response = await HttpClient.get(
+        `/meeting-analysis/${sessionId}/visualization`,
+      );
+      const data = await HttpClient.parseJsonResponse(response);
       processGraphUpdate(data);
       setHasInitialData(true);
     } catch (err) {
@@ -407,7 +402,7 @@ export default function AgentVisualization({
         // Create WebSocket connection - Fix: Use the correct server host instead of client host
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
         const wsHost = process.env.NEXT_PUBLIC_API_HOST || "localhost:3001";
-        const wsUrl = `${protocol}//${wsHost}/ws/visualization`;
+        const wsUrl = `${protocol}//${wsHost}/meeting-analysis/ws/${sessionId}`;
 
         console.log("Connecting to WebSocket:", wsUrl);
         const ws = new WebSocket(wsUrl);

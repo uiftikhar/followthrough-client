@@ -32,7 +32,7 @@ const wsUrl = isServer
     "ws://localhost:3000";
 
 export const API_CONFIG = {
-  baseUrl: apiUrl,
+  baseUrl: "https://ffdf-2-201-41-78.ngrok-free.app",
   wsBaseUrl: wsUrl,
   endpoints: {
     health: {

@@ -50,8 +50,8 @@ export const AuthService = {
       // Create a mock JWT token
       const token = this.generateMockToken();
 
-      // Store in localStorage
-      localStorage.setItem("authToken", token);
+      // Store in localStorage using consistent jwt_token key
+      localStorage.setItem("jwt_token", token);
       localStorage.setItem(
         "user",
         JSON.stringify({
@@ -80,7 +80,7 @@ export const AuthService = {
    * Logout user
    */
   logout(): void {
-    localStorage.removeItem("authToken");
+    localStorage.removeItem("jwt_token");
     localStorage.removeItem("user");
   },
 
@@ -88,7 +88,17 @@ export const AuthService = {
    * Check if user is authenticated
    */
   isAuthenticated(): boolean {
-    return !!localStorage.getItem("authToken");
+    const token = localStorage.getItem("jwt_token");
+    if (!token) return false;
+
+    try {
+      // Basic JWT validation (check if it's not expired)
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Math.floor(Date.now() / 1000);
+      return payload.exp > currentTime;
+    } catch (error) {
+      return false;
+    }
   },
 
   /**
@@ -114,7 +124,32 @@ export const AuthService = {
    * Get auth token
    */
   getToken(): string | null {
-    return localStorage.getItem("authToken");
+    return localStorage.getItem("jwt_token");
+  },
+
+  /**
+   * Refresh token if needed
+   */
+  async refreshToken(): Promise<void> {
+    // In a real app, this would call the server to refresh the token
+    // For now, we'll just check if the current token is valid
+    const token = this.getToken();
+    if (!token) {
+      throw new Error("No token to refresh");
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Math.floor(Date.now() / 1000);
+      
+      if (payload.exp <= currentTime) {
+        // Token is expired, generate a new one for development
+        const newToken = this.generateMockToken();
+        localStorage.setItem("jwt_token", newToken);
+      }
+    } catch (error) {
+      throw new Error("Invalid token format");
+    }
   },
 
   /**

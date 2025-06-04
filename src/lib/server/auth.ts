@@ -17,7 +17,7 @@ export function getAuthToken(): string | undefined {
 
     // Try to get the token from different possible cookie names
     const token =
-      cookieStore.get("auth_token")?.value ||
+      cookieStore.get("jwt_token")?.value ||
       cookieStore.get("token")?.value ||
       cookieStore.get("accessToken")?.value;
 
