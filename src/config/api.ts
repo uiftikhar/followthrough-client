@@ -23,16 +23,16 @@ const apiUrl = isServer
   ? process.env.NEXT_PUBLIC_API_URL
   : window.ENV?.BROWSER_API_URL ||
     process.env.NEXT_PUBLIC_BROWSER_API_URL ||
-    "http://localhost:3000";
+    "https://ffdf-2-201-41-78.ngrok-free.app";
 
 const wsUrl = isServer
   ? process.env.NEXT_PUBLIC_WS_URL
   : window.ENV?.BROWSER_API_URL ||
     process.env.NEXT_PUBLIC_BROWSER_WS_URL ||
-    "ws://localhost:3000";
+    "ws://ffdf-2-201-41-78.ngrok-free.app";
 
 export const API_CONFIG = {
-  baseUrl: "https://ffdf-2-201-41-78.ngrok-free.app",
+  baseUrl: apiUrl,
   wsBaseUrl: wsUrl,
   endpoints: {
     health: {

@@ -12,7 +12,7 @@ import { io, Socket } from "socket.io-client";
 
 // Environment configuration
 const WS_BASE_URL =
-  process.env.NEXT_PUBLIC_WS_URL || "https://ffdf-2-201-41-78.ngrok-free.app";
+  process.env.NEXT_PUBLIC_WS_URL || "ws://ffdf-2-201-41-78.ngrok-free.app";
 
 /**
  * WebSocket Event Types - Client to Server

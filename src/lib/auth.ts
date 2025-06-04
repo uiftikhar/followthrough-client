@@ -3,8 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { HttpClient } from "./api/http-client";
 
 // API URL for auth endpoints
-const API_URL = "https://ffdf-2-201-41-78.ngrok-free.app";
-// const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
 
 export const authOptions: NextAuthOptions = {
   providers: [
