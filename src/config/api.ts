@@ -23,13 +23,13 @@ const apiUrl = isServer
   ? process.env.NEXT_PUBLIC_API_URL
   : window.ENV?.BROWSER_API_URL ||
     process.env.NEXT_PUBLIC_BROWSER_API_URL ||
-    "https://ffdf-2-201-41-78.ngrok-free.app";
+    "https://followthrough-server-production.up.railway.app";
 
 const wsUrl = isServer
   ? process.env.NEXT_PUBLIC_WS_URL
   : window.ENV?.BROWSER_API_URL ||
     process.env.NEXT_PUBLIC_BROWSER_WS_URL ||
-    "ws://ffdf-2-201-41-78.ngrok-free.app";
+    "ws://followthrough-server-production.up.railway.app";
 
 export const API_CONFIG = {
   baseUrl: apiUrl,

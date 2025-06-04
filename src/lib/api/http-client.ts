@@ -12,7 +12,7 @@ export interface ApiResponse<T = any> {
 }
 
 export class HttpClient {
-  private static readonly API_BASE = "https://ffdf-2-201-41-78.ngrok-free.app";
+  private static readonly API_BASE = "https://followthrough-server-production.up.railway.app";
 
   /**
    * Get the JWT token from localStorage
