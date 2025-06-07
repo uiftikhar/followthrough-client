@@ -29,7 +29,7 @@ const wsUrl = isServer
   ? process.env.NEXT_PUBLIC_WS_URL
   : window.ENV?.BROWSER_API_URL ||
     process.env.NEXT_PUBLIC_BROWSER_WS_URL ||
-    "ws://followthrough-server-production.up.railway.app";
+    "wss://followthrough-server-production.up.railway.app";
 
 export const API_CONFIG = {
   baseUrl: apiUrl,
