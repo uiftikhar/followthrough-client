@@ -84,10 +84,12 @@ export function GmailNotificationsButton({
   const [statistics, setStatistics] = useState<StatisticsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [setupEmailNotifications, onSetSetupEmailNotifications] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSetupLoading, setIsSetupLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   // WebSocket state
   const [connectionState, setConnectionState] = useState<ConnectionState>("disconnected");
-  const [isLoading, setIsLoading] = useState(false);
   const [notifications, setNotifications] = useState<EmailNotification[]>([]);
   const [latestNotification, setLatestNotification] = useState<EmailNotification | null>(null);
 
@@ -98,22 +100,23 @@ export function GmailNotificationsButton({
   const wsClientRef = useRef<WebSocketClient | null>(null);
 
   // Derived state
-  const notificationsEnabled = status.isEnabled;
+  const notificationsEnabled = status ? status.isEnabled : false;
   const isConnected = connectionState === "connected";
   const isAuthenticated = GmailAuthService.isAuthenticated();
 
-  useEffect(() => {
-    loadStatus();
-    loadHealth();
-    loadStatistics();
-  }, []);
+  // Remove automatic loading on mount - only load when user explicitly interacts
+  // useEffect(() => {
+  //   loadStatus();
+  //   loadHealth();
+  //   loadStatistics();
+  // }, []);
 
-  // Auto-connect to WebSocket when notifications are enabled
-  useEffect(() => {
-    if (notificationsEnabled && isAuthenticated && connectionState === "disconnected") {
-      connectWebSocket().catch(console.error);
-    }
-  }, [notificationsEnabled, isAuthenticated, connectionState]);
+  // Remove auto-connect to WebSocket - only connect when user explicitly sets up notifications
+  // useEffect(() => {
+  //   if (notificationsEnabled && isAuthenticated && connectionState === "disconnected") {
+  //     connectWebSocket().catch(console.error);
+  //   }
+  // }, [notificationsEnabled, isAuthenticated, connectionState]);
 
   const setupWebSocketListeners = useCallback((client: WebSocketClient) => {
     // Connection events
@@ -195,9 +198,19 @@ export function GmailNotificationsButton({
       }
 
       wsClientRef.current = client;
+      console.log("🔌 WebSocket connected successfully");
     } catch (error) {
+      console.error("Failed to connect WebSocket:", error);
       setConnectionState("error");
-      setError(error instanceof Error ? error.message : "Failed to connect");
+      
+      // Provide more user-friendly error messages
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes("timeout") || errorMessage.includes("unavailable")) {
+        setError("Unable to connect to server. Please check if the server is running and try again.");
+      } else {
+        setError(`WebSocket connection failed: ${errorMessage}`);
+      }
+      
       throw error;
     } finally {
       setIsLoading(false);
@@ -215,13 +228,21 @@ export function GmailNotificationsButton({
   const loadStatus = async () => {
     try {
       const notificationStatus = await GmailNotificationsService.getStatus();
-      setStatus(notificationStatus);
-      setError(null);
-      onStatusChange?.(notificationStatus);
+      console.log("********************* LOAD STATUS *********************", notificationStatus);
+      
+      // Check if response is valid before using it
+      if (notificationStatus && typeof notificationStatus === 'object') {
+        setStatus(notificationStatus);
+        setError(null);
+        onStatusChange?.(notificationStatus);
+      } else {
+        console.warn("Invalid notification status response:", notificationStatus);
+        setError("Invalid response from notification service");
+        onError?.("Invalid response from notification service");
+      }
     } catch (error) {
       console.error("Failed to load Gmail notification status:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       setError(errorMessage);
       onError?.(errorMessage);
     }
@@ -246,8 +267,12 @@ export function GmailNotificationsButton({
   };
 
   const handleSetupNotifications = async () => {
+    if (isSetupLoading) return; // Prevent multiple calls
+    
+    setIsSetupLoading(true);
     try {
       setError(null);
+      setIsInitialized(true); // Mark as initialized when user sets up notifications
 
       const setupOptions: SetupGmailNotificationsDto = {};
       if (labelIds.trim()) {
@@ -256,7 +281,8 @@ export function GmailNotificationsButton({
 
       const result = await GmailNotificationsService.setupNotifications(setupOptions);
 
-      if (result.success) {
+      console.log("********************* SETUP NOTIFICATIONS *********************", result);
+      if (result?.success) {
         await loadStatus();
         await loadHealth();
         
@@ -269,23 +295,28 @@ export function GmailNotificationsButton({
       }
     } catch (error) {
       console.error("Failed to setup notifications:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       setError(errorMessage);
       onError?.(errorMessage);
+    } finally {
+      setIsSetupLoading(false);
     }
   };
 
   const handleDisableNotifications = async () => {
+    if (isSetupLoading) return; // Prevent multiple calls
+    
+    setIsSetupLoading(true);
     try {
       setError(null);
+      setIsInitialized(true); // Mark as initialized when user disables notifications
 
       // Disconnect WebSocket first
       disconnectWebSocket();
 
       const result = await GmailNotificationsService.disableNotifications();
 
-      if (result.success) {
+      if (result?.success) {
         await loadStatus();
         await loadHealth();
       } else {
@@ -297,6 +328,8 @@ export function GmailNotificationsButton({
         error instanceof Error ? error.message : String(error);
       setError(errorMessage);
       onError?.(errorMessage);
+    } finally {
+      setIsSetupLoading(false);
     }
   };
 
@@ -306,7 +339,7 @@ export function GmailNotificationsButton({
 
       const result = await GmailNotificationsService.renewWatch();
 
-      if (result.success) {
+      if (result?.success) {
         await loadStatus();
         await loadHealth();
       } else {
@@ -329,7 +362,7 @@ export function GmailNotificationsButton({
 
       const result = await GmailNotificationsService.testPubSub();
 
-      if (result.success) {
+      if (result?.success) {
         alert(`Pub/Sub Test Success!\n\n${result.message}`);
       } else {
         throw new Error(result.message || "Pub/Sub test failed");
@@ -349,7 +382,7 @@ export function GmailNotificationsButton({
 
       const result = await GmailNotificationsService.processPendingMessages();
 
-      if (result.success) {
+      if (result?.success) {
         alert(
           `Pull Messages Processing Complete!\n\nProcessed: ${result.processed || 0} messages\n${result.message}`,
         );
@@ -392,6 +425,7 @@ export function GmailNotificationsButton({
 
   const refreshAll = async () => {
     try {
+      setIsInitialized(true); // Mark as initialized when user explicitly refreshes
       await Promise.all([
         loadStatus(),
         loadHealth(),
@@ -418,6 +452,20 @@ export function GmailNotificationsButton({
           <div className="bg-red-50 border border-red-200 rounded-lg p-3">
             <p className="text-red-800 text-sm">{error}</p>
           </div>
+          {error.includes("server") && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-800">Server Check</span>
+              </div>
+              <p className="text-blue-800 text-xs">
+                Make sure your server is running at: wss://followthrough-server-production.up.railway.app
+              </p>
+              <p className="text-blue-800 text-xs mt-1">
+                The WebSocket server should be available on the same ngrok URL as your API.
+              </p>
+            </div>
+          )}
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -446,9 +494,9 @@ export function GmailNotificationsButton({
         );
       case "connecting":
         return (
-          <Badge variant="default" className="bg-yellow-500">
-            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-            Connecting
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+            Connecting...
           </Badge>
         );
       case "error":
@@ -460,7 +508,7 @@ export function GmailNotificationsButton({
         );
       default:
         return (
-          <Badge variant="secondary">
+          <Badge variant="outline">
             <WifiOff className="h-3 w-3 mr-1" />
             Disconnected
           </Badge>
@@ -469,6 +517,61 @@ export function GmailNotificationsButton({
   };
 
   const GoogleAuthCard = () => {
+    // Show initial state when component hasn't been initialized
+    if (!isInitialized && !notificationsEnabled) {
+      return (
+        <Card className="w-full">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <BellOff className="h-5 w-5 text-gray-600" />
+                <CardTitle className="text-lg">Gmail Push Notifications</CardTitle>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refreshAll}
+                disabled={isLoading}
+              >
+                <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+                {isLoading ? "Loading..." : "Check Status"}
+              </Button>
+            </div>
+            <CardDescription>
+              Click "Check Status" to load current notification settings, or toggle notifications to get started
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8">
+              <Mail className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <p className="text-gray-600 mb-4">
+                Gmail push notifications are not configured yet
+              </p>
+              <div className="flex items-center justify-center gap-2">
+                <Checkbox
+                  checked={false}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      handleSetupNotifications();
+                    }
+                  }}
+                  disabled={isSetupLoading || !isAuthenticated}
+                />
+                <span className="text-sm">
+                  {isSetupLoading ? "Setting up notifications..." : "Enable Gmail Push Notifications"}
+                </span>
+              </div>
+              {!isAuthenticated && (
+                <p className="text-sm text-gray-500 mt-2">
+                  Please authenticate with Google first
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
     return (
       <Card className="w-full">
       <CardHeader>
@@ -524,6 +627,9 @@ export function GmailNotificationsButton({
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-blue-600" />
                     <span className="font-medium">Push Notifications</span>
+                    {isSetupLoading && (
+                      <RefreshCw className="h-4 w-4 animate-spin text-blue-600" />
+                    )}
                   </div>
                   <Checkbox
                     checked={notificationsEnabled}
@@ -534,7 +640,7 @@ export function GmailNotificationsButton({
                         handleDisableNotifications();
                       }
                     }}
-                    disabled={isLoading || !isAuthenticated}
+                    disabled={isSetupLoading || isLoading || !isAuthenticated}
                   />
                 </div>
 
@@ -602,11 +708,20 @@ export function GmailNotificationsButton({
                   <Button
                     variant="outline"
                     onClick={connectWebSocket}
-                    disabled={isLoading}
+                    disabled={isLoading || connectionState === "connecting"}
                     className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
                   >
-                    <Wifi className="h-4 w-4 mr-2" />
-                    Connect WebSocket
+                    {connectionState === "connecting" ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Connecting...
+                      </>
+                    ) : (
+                      <>
+                        <Wifi className="h-4 w-4 mr-2" />
+                        Connect WebSocket
+                      </>
+                    )}
                   </Button>
                 )}
               </div>

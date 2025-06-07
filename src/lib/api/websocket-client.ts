@@ -8,11 +8,13 @@
  * - Subscription management
  */
 
+
 import { io, Socket } from "socket.io-client";
 
 // Environment configuration
 const WS_BASE_URL =
-  process.env.NEXT_PUBLIC_WS_URL || "ws://ffdf-2-201-41-78.ngrok-free.app";
+  // TODO: Change to production URL insterad of ngrok URL everywhere
+  process.env.NEXT_PUBLIC_WS_URL || "wss://followthrough-server-production.up.railway.app";
 
 /**
  * WebSocket Event Types - Client to Server
@@ -214,7 +216,7 @@ export class WebSocketClient {
     this.isManualDisconnect = false;
 
     try {
-      this.log("Connecting to WebSocket...", WS_BASE_URL);
+      this.log("Connecting to WebSocket...", `${WS_BASE_URL}/gmail-notifications`);
 
       // Create socket connection with JWT auth
       this.socket = io(`${WS_BASE_URL}/gmail-notifications`, {
@@ -222,25 +224,31 @@ export class WebSocketClient {
         auth: {
           token: this.jwtToken,
         },
-        timeout: 10000,
+        timeout: 15000, // Increased timeout
+        forceNew: true, // Force new connection
+        upgrade: true,
+        rememberUpgrade: false,
       });
 
       this.setupEventHandlers();
 
-      // Wait for connection
+      // Wait for connection with better error handling
       await new Promise<void>((resolve, reject) => {
         const timeout = setTimeout(() => {
-          reject(new Error("Connection timeout"));
-        }, 10000);
+          this.log("Connection timeout after 15 seconds");
+          reject(new Error("Connection timeout - server may be unavailable"));
+        }, 15000);
 
         this.socket!.on("connect", () => {
           clearTimeout(timeout);
+          this.log("✅ Successfully connected to WebSocket");
           resolve();
         });
 
         this.socket!.on("connect_error", (error) => {
           clearTimeout(timeout);
-          reject(error);
+          this.log("❌ Connection error:", error);
+          reject(new Error(`Connection failed: ${error.message || error}`));
         });
       });
     } catch (error) {

@@ -5,8 +5,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2, AlertCircle } from "lucide-react";
-import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
-import { GmailNotificationsButton } from "@/components/auth/GmailNotificationsButton";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 
@@ -70,37 +68,7 @@ export default function DashboardPage() {
     }
   }, [searchParams]);
 
-  const handleAuthSuccess = () => {
-    setAuthMessage({
-      type: "success",
-      message: "Google services connected successfully!",
-    });
-  };
 
-  const handleAuthError = (error: string) => {
-    setAuthMessage({
-      type: "error",
-      message: error,
-    });
-  };
-
-  const handleNotificationStatusChange = (status: any) => {
-    // Since notificationsEnabled is now derived from health data,
-    // we'll check if the operation was successful
-    if (status.success && status.isConnected) {
-      setAuthMessage({
-        type: "success",
-        message: "Gmail connection updated successfully!",
-      });
-    }
-  };
-
-  const handleNotificationError = (error: string) => {
-    setAuthMessage({
-      type: "error",
-      message: `Gmail Notifications Error: ${error}`,
-    });
-  };
 
   // Auto-hide messages after 10 seconds
   useEffect(() => {
@@ -141,17 +109,7 @@ export default function DashboardPage() {
         </Alert>
       )}
 
-      {/* Google Authorization Section */}
-      <GoogleAuthButton
-        onAuthSuccess={handleAuthSuccess}
-        onAuthError={handleAuthError}
-      />
 
-      {/* Gmail Push Notifications Section */}
-      <GmailNotificationsButton
-        onStatusChange={handleNotificationStatusChange}
-        onError={handleNotificationError}
-      />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Transcripts Card */}
@@ -193,6 +151,20 @@ export default function DashboardPage() {
             className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
           >
             View Knowledge Map
+          </Link>
+        </div>
+
+        {/* Email Triage Card */}
+        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+          <h2 className="mb-2 text-xl font-semibold">Email Triage</h2>
+          <p className="mb-4 text-gray-600 dark:text-gray-300">
+            Automatically triage and analyze your Gmail messages with AI
+          </p>
+          <Link
+            href="/email-triage"
+            className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          >
+            Email Triage
           </Link>
         </div>
       </div>

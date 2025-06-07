@@ -29,7 +29,7 @@ export class HttpClient {
     const headers: HeadersInit = {
       "Content-Type": "application/json",
       // Add ngrok header for local development/testing
-      "ngrok-skip-browser-warning": "any-value",
+      // "ngrok-skip-browser-warning": "any-value",
     };
 
     return headers;
@@ -41,7 +41,7 @@ export class HttpClient {
   private static getCommonHeadersWithoutContentType(): HeadersInit {
     const headers: HeadersInit = {
       // Add ngrok header for local development/testing
-      "ngrok-skip-browser-warning": "any-value",
+      // "ngrok-skip-browser-warning": "any-value",
     };
 
     return headers;
