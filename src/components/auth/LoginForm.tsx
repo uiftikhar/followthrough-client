@@ -6,8 +6,8 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "@/hooks/use-toast";
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("abc@gmail.com");
-  const [password, setPassword] = useState("temp123456");
+  const [email, setEmail] = useState("bund9876@gmail.com");
+  const [password, setPassword] = useState("qazwsxed28!");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -103,7 +103,7 @@ export default function LoginForm() {
       </form>
 
       <div className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
-        <p>Default credentials: abc@gmail.com / temp123456</p>
+        <p>Default credentials: bund9876@gmail.com / qazwsxed28!</p>
       </div>
     </div>
   );

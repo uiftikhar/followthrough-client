@@ -54,20 +54,7 @@ export class GoogleOAuthService {
         throw new Error("Failed to get authorization URL from server");
       }
 
-      // const setupEmailNotifications = await HttpClient.post(
-      //   "/oauth/google/setup-email-notifications"
-      // );
-
-      // const setupEmailNotificationsData = await HttpClient.parseJsonResponse<{
-      //   success: boolean;
-      //   message: string;
-      //   watchInfo: WatchInfo
-      // }>(response);
-      // console.log(
-      //   "********************* SETUP EMAIL NOTIFICATIONS *********************",
-      //   setupEmailNotificationsData.message, setupEmailNotificationsData.watchInfo,
-      // );
-
+      
       // Redirect to Google OAuth (server-generated URL)
       window.location.href = data.authUrl;
     } catch (error) {
