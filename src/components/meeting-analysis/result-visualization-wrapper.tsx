@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   MeetingAnalysisService,
-  MeetingAnalysisResponse,
+  AnalysisResultDto,
 } from "@/lib/api/meeting-analysis-service";
-import { ResultVisualization } from "./result-visualization";
+import { EnhancedResultVisualization } from "./enhanced-result-visualization";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -13,7 +13,7 @@ import { AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 interface ResultVisualizationWrapperProps {
-  initialData: MeetingAnalysisResponse;
+  initialData: AnalysisResultDto;
   sessionId: string;
 }
 
@@ -22,7 +22,7 @@ export function ResultVisualizationWrapper({
   sessionId,
 }: ResultVisualizationWrapperProps) {
   const [analysisData, setAnalysisData] =
-    useState<MeetingAnalysisResponse>(initialData);
+    useState<AnalysisResultDto>(initialData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -109,7 +109,7 @@ export function ResultVisualizationWrapper({
         </Alert>
       )}
 
-      <ResultVisualization
+      <EnhancedResultVisualization
         data={analysisData}
         isLoading={loading}
         onRefresh={handleRefresh}
