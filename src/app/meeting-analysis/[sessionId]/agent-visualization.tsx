@@ -14,7 +14,8 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Loader2, Info } from "lucide-react";
 import { API_CONFIG } from "@/config/api";
 import { HttpClient } from "@/lib/api/http-client";
 
@@ -106,16 +107,198 @@ function TopicNode({ data }: { data: any }) {
 }
 
 function ActionItemNode({ data }: { data: any }) {
+  const getPriorityColor = (priority: string) => {
+    switch (priority?.toLowerCase()) {
+      case "high":
+        return "bg-red-100 text-red-800 border-red-300";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      case "low":
+        return "bg-green-100 text-green-800 border-green-300";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-300";
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case "completed":
+        return "bg-green-500";
+      case "in_progress":
+        return "bg-yellow-500";
+      case "pending":
+        return "bg-gray-400";
+      case "blocked":
+        return "bg-red-500";
+      default:
+        return "bg-gray-400";
+    }
+  };
+
+  const hasDetailedInfo = data.acceptanceCriteria || data.technicalNotes || data.businessValue || data.risks || data.dependencies;
+
   return (
-    <div
-      className="rounded-md border-2 border-purple-500 bg-purple-50 p-2 text-purple-800 shadow-md"
-      style={{ maxWidth: "200px" }}
-    >
-      <div className="font-semibold">{data.label}</div>
-      {data.assignee && (
-        <div className="mt-1 text-xs">Assignee: {data.assignee}</div>
-      )}
-    </div>
+    <TooltipProvider>
+      <div
+        className="rounded-md border-2 border-purple-500 bg-purple-50 p-3 text-purple-800 shadow-md relative"
+        style={{ maxWidth: "280px", minWidth: "220px" }}
+      >
+        {/* Info icon for detailed tooltip */}
+        {hasDetailedInfo && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button className="absolute top-2 right-2 p-1 hover:bg-purple-200 rounded">
+                <Info className="h-3 w-3" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="max-w-sm p-4">
+              <div className="space-y-3">
+                {data.businessValue && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">Business Value</h4>
+                    <p className="text-xs">{data.businessValue}</p>
+                  </div>
+                )}
+                
+                {data.acceptanceCriteria && data.acceptanceCriteria.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">Acceptance Criteria</h4>
+                    <ul className="text-xs space-y-1">
+                      {data.acceptanceCriteria.map((criteria: string, index: number) => (
+                        <li key={index} className="flex items-start">
+                          <span className="mr-1">•</span>
+                          <span>{criteria}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {data.technicalNotes && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">Technical Notes</h4>
+                    <p className="text-xs">{data.technicalNotes}</p>
+                  </div>
+                )}
+
+                {data.dependencies && data.dependencies.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">Dependencies</h4>
+                    <ul className="text-xs space-y-1">
+                      {data.dependencies.map((dep: string, index: number) => (
+                        <li key={index} className="flex items-start">
+                          <span className="mr-1">•</span>
+                          <span>{dep}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {data.risks && data.risks.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">Risks</h4>
+                    <ul className="text-xs space-y-1">
+                      {data.risks.map((risk: string, index: number) => (
+                        <li key={index} className="flex items-start">
+                          <span className="mr-1">⚠</span>
+                          <span>{risk}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {data.epic && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-1">Epic</h4>
+                    <p className="text-xs">{data.epic}</p>
+                  </div>
+                )}
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        )}
+
+        {/* Title and Priority */}
+        <div className="flex items-start justify-between mb-2 pr-6">
+          <div className="font-semibold text-sm leading-tight flex-1">
+            {data.label || data.title}
+          </div>
+          {data.priority && (
+            <span className={`px-1.5 py-0.5 rounded text-xs font-medium border ${getPriorityColor(data.priority)}`}>
+              {data.priority.toUpperCase()}
+            </span>
+          )}
+        </div>
+
+        {/* Status and Story Points */}
+        <div className="flex items-center justify-between mb-2">
+          {data.status && (
+            <div className="flex items-center">
+              <div className={`w-2 h-2 rounded-full mr-1.5 ${getStatusColor(data.status)}`} />
+              <span className="text-xs capitalize">{data.status.replace('_', ' ')}</span>
+            </div>
+          )}
+          {data.storyPoints && (
+            <span className="text-xs bg-purple-200 px-1.5 py-0.5 rounded">
+              {data.storyPoints} SP
+            </span>
+          )}
+        </div>
+
+        {/* Assignee */}
+        {data.assignee && (
+          <div className="text-xs mb-2">
+            <span className="font-medium">Assignee:</span> {data.assignee}
+          </div>
+        )}
+
+        {/* Due Date */}
+        {data.dueDate && data.dueDate !== "No deadline specified" && (
+          <div className="text-xs mb-2">
+            <span className="font-medium">Due:</span> {data.dueDate}
+          </div>
+        )}
+
+        {/* Ticket Type and Component */}
+        <div className="flex flex-wrap gap-1 mt-2">
+          {data.ticketType && (
+            <span className="px-1.5 py-0.5 bg-purple-200 text-purple-900 rounded text-xs">
+              {data.ticketType}
+            </span>
+          )}
+          {data.component && (
+            <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
+              {data.component}
+            </span>
+          )}
+        </div>
+
+        {/* Labels */}
+        {data.labels && data.labels.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {data.labels.slice(0, 3).map((label: string, index: number) => (
+              <span key={index} className="px-1.5 py-0.5 bg-gray-200 text-gray-700 rounded text-xs">
+                {label}
+              </span>
+            ))}
+            {data.labels.length > 3 && (
+              <span className="px-1.5 py-0.5 bg-gray-200 text-gray-700 rounded text-xs">
+                +{data.labels.length - 3}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Description preview */}
+        {data.description && (
+          <div className="mt-2 text-xs text-purple-700 line-clamp-2">
+            {data.description}
+          </div>
+        )}
+      </div>
+    </TooltipProvider>
   );
 }
 

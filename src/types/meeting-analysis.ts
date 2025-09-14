@@ -15,14 +15,33 @@ export interface Topic {
   duration?: string;
 }
 
-// Action Item structure
+// Action Item structure - Enhanced with new fields
 export interface ActionItem {
+  // Legacy fields
   description: string;
   assignee?: string;
   deadline?: string;
   status?: string;
   priority?: string;
   context?: string;
+  
+  // Enhanced fields from new API
+  title?: string;
+  dueDate?: string;
+  storyPoints?: number;
+  ticketType?: string;
+  component?: string;
+  epic?: string;
+  businessValue?: string;
+  technicalNotes?: string;
+  acceptanceCriteria?: string[];
+  dependencies?: string[];
+  risks?: string[];
+  labels?: string[];
+  
+  // Additional optional fields
+  discussionPoints?: string[];
+  decisions?: string[];
 }
 
 // Sentiment Analysis structures

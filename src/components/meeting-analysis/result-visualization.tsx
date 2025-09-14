@@ -29,6 +29,23 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useState } from "react";
+import dynamic from "next/dynamic";
+
+// Dynamically import AgentVisualization to avoid SSR issues
+const AgentVisualization = dynamic(
+  () => import("../../app/meeting-analysis/[sessionId]/agent-visualization"),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2 text-gray-500">Loading visualization...</p>
+        </div>
+      </div>
+    )
+  }
+);
 
 interface ResultVisualizationProps {
   data: MeetingAnalysisResponse;
@@ -273,10 +290,11 @@ export function ResultVisualization({
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-4 grid grid-cols-4">
+        <TabsList className="mb-4 grid grid-cols-5">
           <TabsTrigger value="summary">Summary</TabsTrigger>
           <TabsTrigger value="topics">Topics</TabsTrigger>
           <TabsTrigger value="action-items">Action Items</TabsTrigger>
+          <TabsTrigger value="visualization">Visualization</TabsTrigger>
           <TabsTrigger value="sentiment">Sentiment</TabsTrigger>
         </TabsList>
 
@@ -452,48 +470,160 @@ export function ResultVisualization({
             </CardHeader>
             <CardContent>
               {resultData?.actionItems && resultData.actionItems.length > 0 ? (
-                <ScrollArea className="h-[500px] pr-4">
-                  <div className="space-y-4">
+                <ScrollArea className="h-[600px] pr-4">
+                  <div className="space-y-6">
                     {resultData.actionItems.map((item, i) => (
-                      <Card key={i}>
-                        <CardHeader className="py-3">
-                          <div className="flex items-start justify-between">
-                            <CardTitle className="text-lg">
-                              {item.description}
-                            </CardTitle>
-                            <div className="flex gap-2">
+                      <Card key={i} className="border-l-4 border-purple-500">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <CardTitle className="text-lg leading-tight">
+                                {item.title || item.description}
+                              </CardTitle>
+                              {item.title && item.description && item.title !== item.description && (
+                                <p className="mt-2 text-sm text-gray-600">{item.description}</p>
+                              )}
+                            </div>
+                            <div className="flex flex-col gap-2">
                               {getPriorityBadge(item.priority)}
                               {getActionStatusBadge(item.status)}
+                              {item.storyPoints && (
+                                <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                                  {item.storyPoints} SP
+                                </Badge>
+                              )}
                             </div>
                           </div>
                         </CardHeader>
-                        <CardContent className="py-2">
-                          <div className="grid grid-cols-2 gap-4">
+                        <CardContent className="space-y-4">
+                          {/* Basic Information Grid */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {item.assignee && (
                               <div>
-                                <h4 className="text-sm font-medium">
-                                  Assignee
-                                </h4>
-                                <p>{item.assignee}</p>
+                                <h4 className="text-sm font-semibold text-gray-700 mb-1">Assignee</h4>
+                                <p className="text-sm">{item.assignee}</p>
                               </div>
                             )}
 
-                            {item.deadline && (
+                            {(item.dueDate || item.deadline) && (item.dueDate !== "No deadline specified") && (
                               <div>
-                                <h4 className="text-sm font-medium">
-                                  Due Date
-                                </h4>
-                                <p>{item.deadline}</p>
+                                <h4 className="text-sm font-semibold text-gray-700 mb-1">Due Date</h4>
+                                <p className="text-sm">{item.dueDate || item.deadline}</p>
                               </div>
                             )}
 
-                            {item.context && (
-                              <div className="col-span-2">
-                                <h4 className="text-sm font-medium">Context</h4>
-                                <p>{item.context}</p>
+                            {item.ticketType && (
+                              <div>
+                                <h4 className="text-sm font-semibold text-gray-700 mb-1">Type</h4>
+                                <Badge variant="outline" className="bg-purple-50 text-purple-700">
+                                  {item.ticketType}
+                                </Badge>
+                              </div>
+                            )}
+
+                            {item.component && (
+                              <div>
+                                <h4 className="text-sm font-semibold text-gray-700 mb-1">Component</h4>
+                                <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                                  {item.component}
+                                </Badge>
+                              </div>
+                            )}
+
+                            {item.epic && (
+                              <div>
+                                <h4 className="text-sm font-semibold text-gray-700 mb-1">Epic</h4>
+                                <p className="text-sm font-medium text-indigo-700">{item.epic}</p>
                               </div>
                             )}
                           </div>
+
+                          {/* Labels */}
+                          {item.labels && item.labels.length > 0 && (
+                            <div>
+                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Labels</h4>
+                              <div className="flex flex-wrap gap-1">
+                                {item.labels.map((label: string, j: number) => (
+                                  <Badge key={j} variant="outline" className="bg-gray-50 text-gray-700 text-xs">
+                                    {label}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Business Value */}
+                          {item.businessValue && (
+                            <div>
+                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Business Value</h4>
+                              <p className="text-sm bg-green-50 p-3 rounded-lg border-l-2 border-green-400">
+                                {item.businessValue}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Acceptance Criteria */}
+                          {item.acceptanceCriteria && item.acceptanceCriteria.length > 0 && (
+                            <div>
+                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Acceptance Criteria</h4>
+                              <ul className="space-y-1 bg-blue-50 p-3 rounded-lg">
+                                {item.acceptanceCriteria.map((criteria: string, j: number) => (
+                                  <li key={j} className="flex items-start text-sm">
+                                    <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+                                    <span>{criteria}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* Technical Notes */}
+                          {item.technicalNotes && (
+                            <div>
+                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Technical Notes</h4>
+                              <p className="text-sm bg-gray-50 p-3 rounded-lg border-l-2 border-gray-400">
+                                {item.technicalNotes}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Dependencies */}
+                          {item.dependencies && item.dependencies.length > 0 && (
+                            <div>
+                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Dependencies</h4>
+                              <ul className="space-y-1 bg-yellow-50 p-3 rounded-lg">
+                                {item.dependencies.map((dep: string, j: number) => (
+                                  <li key={j} className="flex items-start text-sm">
+                                    <Clock className="h-4 w-4 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" />
+                                    <span>{dep}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* Risks */}
+                          {item.risks && item.risks.length > 0 && (
+                            <div>
+                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Risks</h4>
+                              <ul className="space-y-1 bg-red-50 p-3 rounded-lg">
+                                {item.risks.map((risk: string, j: number) => (
+                                  <li key={j} className="flex items-start text-sm">
+                                    <AlertCircle className="h-4 w-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" />
+                                    <span>{risk}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* Context (Legacy field) */}
+                          {item.context && (
+                            <div>
+                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Context</h4>
+                              <p className="text-sm bg-gray-50 p-3 rounded-lg">{item.context}</p>
+                            </div>
+                          )}
                         </CardContent>
                       </Card>
                     ))}
@@ -506,6 +636,26 @@ export function ResultVisualization({
                     ? "Action items are still being extracted..."
                     : "No action items were identified in this meeting."}
                 </p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="visualization">
+          <Card>
+            <CardHeader>
+              <CardTitle>Agent Visualization</CardTitle>
+              <CardDescription>
+                Interactive visualization of the meeting analysis process and relationships
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {resultData?.sessionId ? (
+                <AgentVisualization sessionId={resultData.sessionId} />
+              ) : (
+                <div className="py-8 text-center text-gray-500">
+                  <p>Visualization not available - Session ID missing</p>
+                </div>
               )}
             </CardContent>
           </Card>
