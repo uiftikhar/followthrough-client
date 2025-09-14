@@ -33,9 +33,10 @@ import {
   Tag,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useToast } from "@/hooks/use-toast";
+import { useAnalytics } from "@/lib/analytics";
 
 // Dynamically import AgentVisualization to avoid SSR issues
 const AgentVisualization = dynamic(
@@ -66,6 +67,7 @@ export function ResultVisualization({
 }: ResultVisualizationProps) {
   const [activeTab, setActiveTab] = useState("summary");
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   // Helper function to get the actual data from results
   const getResultData = () => {
@@ -98,6 +100,26 @@ export function ResultVisualization({
 
   // Get the actual data
   const resultData = getResultData();
+
+  // Track page view and analysis completion
+  useEffect(() => {
+    if (resultData?.sessionId) {
+      analytics.trackPageView('meeting_analysis_results', {
+        session_id: resultData.sessionId,
+        status: resultData.status
+      });
+
+      if (resultData.status === 'completed') {
+        analytics.trackAnalysisCompleted({
+          session_id: resultData.sessionId,
+          topics_found: resultData.topics?.length || 0,
+          action_items_found: resultData.actionItems?.length || 0,
+          sentiment_analyzed: !!resultData.sentiment,
+          status: 'completed'
+        });
+      }
+    }
+  }, [resultData?.sessionId, resultData?.status, analytics]);
 
   // Show loading state
   if (isLoading && !resultData) {
@@ -296,7 +318,11 @@ export function ResultVisualization({
         </Alert>
       )}
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={(newTab) => {
+        // Track tab switches
+        analytics.trackTabSwitch(activeTab, newTab, resultData?.sessionId);
+        setActiveTab(newTab);
+      }}>
         <TabsList className="mb-4 grid grid-cols-5">
           <TabsTrigger value="summary">Summary</TabsTrigger>
           <TabsTrigger value="topics">Topics</TabsTrigger>
@@ -482,6 +508,7 @@ export function ResultVisualization({
                     variant="outline" 
                     size="sm"
                     onClick={() => {
+                      analytics.trackFeatureUsed('action_items_edit_clicked');
                       toast({
                         title: "Edit Mode",
                         description: "Edit functionality will be available soon. You'll be able to modify action items directly.",
@@ -496,9 +523,15 @@ export function ResultVisualization({
                     variant="outline" 
                     size="sm"
                     onClick={() => {
+                      const itemCount = resultData?.actionItems?.length || 0;
+                      analytics.trackJiraPush(itemCount, false, 'Not implemented yet');
+                      analytics.trackFeatureUsed('jira_push_clicked', {
+                        action_items_count: itemCount
+                      });
+                      
                       toast({
                         title: "Push to Jira",
-                        description: `Preparing to push ${resultData?.actionItems?.length || 0} action items to Jira...`,
+                        description: `Preparing to push ${itemCount} action items to Jira...`,
                       });
                       // TODO: Implement actual Jira integration
                     }}
@@ -690,7 +723,13 @@ export function ResultVisualization({
             </CardHeader>
             <CardContent>
               {resultData?.sessionId ? (
-                <AgentVisualization sessionId={resultData.sessionId} />
+                <div onMouseEnter={() => {
+                  analytics.trackFeatureUsed('agent_visualization_viewed', {
+                    session_id: resultData.sessionId
+                  });
+                }}>
+                  <AgentVisualization sessionId={resultData.sessionId} />
+                </div>
               ) : (
                 <div className="py-8 text-center text-gray-500">
                   <p>Visualization not available - Session ID missing</p>
