@@ -26,10 +26,16 @@ import {
   Clock,
   ArrowUpCircle,
   ArrowDownCircle,
+  Edit,
+  ExternalLink,
+  User,
+  Calendar,
+  Tag,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import { useToast } from "@/hooks/use-toast";
 
 // Dynamically import AgentVisualization to avoid SSR issues
 const AgentVisualization = dynamic(
@@ -59,6 +65,7 @@ export function ResultVisualization({
   onRefresh,
 }: ResultVisualizationProps) {
   const [activeTab, setActiveTab] = useState("summary");
+  const { toast } = useToast();
 
   // Helper function to get the actual data from results
   const getResultData = () => {
@@ -461,168 +468,200 @@ export function ResultVisualization({
         <TabsContent value="action-items">
           <Card>
             <CardHeader>
-              <CardTitle>Action Items</CardTitle>
-              <CardDescription>
-                {resultData?.actionItems
-                  ? `${resultData.actionItems.length} action items identified`
-                  : "No action items identified yet"}
-              </CardDescription>
+              <div className="flex items-start justify-between">
+                <div>
+                  <CardTitle>Action Items</CardTitle>
+                  <CardDescription>
+                    {resultData?.actionItems
+                      ? `${resultData.actionItems.length} action items identified`
+                      : "No action items identified yet"}
+                  </CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      toast({
+                        title: "Edit Mode",
+                        description: "Edit functionality will be available soon. You'll be able to modify action items directly.",
+                      });
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Edit
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      toast({
+                        title: "Push to Jira",
+                        description: `Preparing to push ${resultData?.actionItems?.length || 0} action items to Jira...`,
+                      });
+                      // TODO: Implement actual Jira integration
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Push to Jira
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {resultData?.actionItems && resultData.actionItems.length > 0 ? (
                 <ScrollArea className="h-[600px] pr-4">
-                  <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {resultData.actionItems.map((item, i) => (
-                      <Card key={i} className="border-l-4 border-purple-500">
-                        <CardHeader className="pb-3">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <CardTitle className="text-lg leading-tight">
-                                {item.title || item.description}
-                              </CardTitle>
-                              {item.title && item.description && item.title !== item.description && (
-                                <p className="mt-2 text-sm text-gray-600">{item.description}</p>
-                              )}
-                            </div>
-                            <div className="flex flex-col gap-2">
-                              {getPriorityBadge(item.priority)}
-                              {getActionStatusBadge(item.status)}
-                              {item.storyPoints && (
-                                <Badge variant="outline" className="bg-blue-50 text-blue-700">
-                                  {item.storyPoints} SP
-                                </Badge>
-                              )}
-                            </div>
+                      <Card key={i} className="hover:shadow-lg transition-shadow duration-200 border border-gray-200 bg-white">
+                        <CardContent className="p-4">
+                          {/* Title */}
+                          <div className="mb-3">
+                            <h3 className="text-sm font-medium text-gray-900 leading-tight line-clamp-2">
+                              {item.title || item.description}
+                            </h3>
                           </div>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          {/* Basic Information Grid */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {item.assignee && (
-                              <div>
-                                <h4 className="text-sm font-semibold text-gray-700 mb-1">Assignee</h4>
-                                <p className="text-sm">{item.assignee}</p>
-                              </div>
-                            )}
 
-                            {(item.dueDate || item.deadline) && (item.dueDate !== "No deadline specified") && (
-                              <div>
-                                <h4 className="text-sm font-semibold text-gray-700 mb-1">Due Date</h4>
-                                <p className="text-sm">{item.dueDate || item.deadline}</p>
-                              </div>
-                            )}
-
-                            {item.ticketType && (
-                              <div>
-                                <h4 className="text-sm font-semibold text-gray-700 mb-1">Type</h4>
-                                <Badge variant="outline" className="bg-purple-50 text-purple-700">
-                                  {item.ticketType}
-                                </Badge>
-                              </div>
-                            )}
-
+                          {/* Component/Epic Badge */}
+                          <div className="mb-3 flex flex-wrap gap-1">
                             {item.component && (
-                              <div>
-                                <h4 className="text-sm font-semibold text-gray-700 mb-1">Component</h4>
-                                <Badge variant="outline" className="bg-blue-50 text-blue-700">
-                                  {item.component}
-                                </Badge>
-                              </div>
+                              <Badge 
+                                className="text-xs px-2 py-1 bg-orange-100 text-orange-800 hover:bg-orange-100"
+                                variant="secondary"
+                              >
+                                {item.component}
+                              </Badge>
                             )}
-
                             {item.epic && (
-                              <div>
-                                <h4 className="text-sm font-semibold text-gray-700 mb-1">Epic</h4>
-                                <p className="text-sm font-medium text-indigo-700">{item.epic}</p>
+                              <Badge 
+                                className="text-xs px-2 py-1 bg-blue-100 text-blue-800 hover:bg-blue-100"
+                                variant="secondary"
+                              >
+                                {item.epic}
+                              </Badge>
+                            )}
+                            {item.ticketType && (
+                              <Badge 
+                                className="text-xs px-2 py-1 bg-purple-100 text-purple-800 hover:bg-purple-100"
+                                variant="secondary"
+                              >
+                                {item.ticketType}
+                              </Badge>
+                            )}
+                          </div>
+
+                          {/* Status and Priority Row */}
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              {/* Status */}
+                              {item.status && (
+                                <div className="flex items-center gap-1">
+                                  <div className={`w-2 h-2 rounded-full ${
+                                    item.status.toLowerCase() === 'completed' ? 'bg-green-500' :
+                                    item.status.toLowerCase() === 'in_progress' ? 'bg-blue-500' :
+                                    item.status.toLowerCase() === 'pending' ? 'bg-gray-400' :
+                                    'bg-red-500'
+                                  }`} />
+                                  <span className="text-xs text-gray-600 capitalize">
+                                    {item.status.replace('_', ' ')}
+                                  </span>
+                                </div>
+                              )}
+                              
+                              {/* Priority */}
+                              {item.priority && (
+                                <div className="flex items-center gap-1">
+                                  {item.priority.toLowerCase() === 'high' && <ArrowUpCircle className="h-3 w-3 text-red-500" />}
+                                  {item.priority.toLowerCase() === 'medium' && <ArrowUpCircle className="h-3 w-3 text-yellow-500" />}
+                                  {item.priority.toLowerCase() === 'low' && <ArrowDownCircle className="h-3 w-3 text-green-500" />}
+                                  <span className="text-xs text-gray-600">{item.priority}</span>
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Story Points */}
+                            {item.storyPoints && (
+                              <div className="text-xs text-gray-500 font-medium">
+                                {item.storyPoints}
                               </div>
                             )}
                           </div>
 
-                          {/* Labels */}
-                          {item.labels && item.labels.length > 0 && (
-                            <div>
-                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Labels</h4>
-                              <div className="flex flex-wrap gap-1">
-                                {item.labels.map((label: string, j: number) => (
-                                  <Badge key={j} variant="outline" className="bg-gray-50 text-gray-700 text-xs">
-                                    {label}
-                                  </Badge>
-                                ))}
+                          {/* Bottom Row - Assignee and Ticket ID */}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              {item.assignee && (
+                                <>
+                                  <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                                    <User className="h-3 w-3 text-gray-600" />
+                                  </div>
+                                  <span className="text-xs text-gray-600">{item.assignee}</span>
+                                </>
+                              )}
+                            </div>
+                            
+                            {/* Mock Ticket ID */}
+                            <div className="text-xs text-gray-500 font-mono">
+                              TIS-{(i + 1).toString().padStart(2, '0')}
+                            </div>
+                          </div>
+
+                          {/* Expandable Details (Hidden by default, can be toggled) */}
+                          {(item.businessValue || item.acceptanceCriteria || item.technicalNotes || 
+                            item.dependencies || item.risks || item.labels) && (
+                            <details className="mt-3 group">
+                              <summary className="text-xs text-blue-600 cursor-pointer hover:text-blue-800 list-none">
+                                <span className="group-open:hidden">Show details</span>
+                                <span className="hidden group-open:inline">Hide details</span>
+                              </summary>
+                              
+                              <div className="mt-2 pt-2 border-t border-gray-100 space-y-2">
+                                {/* Business Value */}
+                                {item.businessValue && (
+                                  <div>
+                                    <h5 className="text-xs font-semibold text-gray-700 mb-1">Business Value</h5>
+                                    <p className="text-xs text-gray-600 bg-green-50 p-2 rounded">{item.businessValue}</p>
+                                  </div>
+                                )}
+
+                                {/* Acceptance Criteria */}
+                                {item.acceptanceCriteria && item.acceptanceCriteria.length > 0 && (
+                                  <div>
+                                    <h5 className="text-xs font-semibold text-gray-700 mb-1">Acceptance Criteria</h5>
+                                    <ul className="text-xs text-gray-600 space-y-1">
+                                      {item.acceptanceCriteria.slice(0, 3).map((criteria: string, j: number) => (
+                                        <li key={j} className="flex items-start">
+                                          <CheckCircle2 className="h-3 w-3 text-green-500 mr-1 mt-0.5 flex-shrink-0" />
+                                          <span>{criteria}</span>
+                                        </li>
+                                      ))}
+                                      {item.acceptanceCriteria.length > 3 && (
+                                        <li className="text-gray-500">+{item.acceptanceCriteria.length - 3} more...</li>
+                                      )}
+                                    </ul>
+                                  </div>
+                                )}
+
+                                {/* Labels */}
+                                {item.labels && item.labels.length > 0 && (
+                                  <div>
+                                    <h5 className="text-xs font-semibold text-gray-700 mb-1">Labels</h5>
+                                    <div className="flex flex-wrap gap-1">
+                                      {item.labels.slice(0, 4).map((label: string, j: number) => (
+                                        <Badge key={j} variant="outline" className="text-xs px-1 py-0">
+                                          {label}
+                                        </Badge>
+                                      ))}
+                                      {item.labels.length > 4 && (
+                                        <span className="text-xs text-gray-500">+{item.labels.length - 4}</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
-                            </div>
-                          )}
-
-                          {/* Business Value */}
-                          {item.businessValue && (
-                            <div>
-                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Business Value</h4>
-                              <p className="text-sm bg-green-50 p-3 rounded-lg border-l-2 border-green-400">
-                                {item.businessValue}
-                              </p>
-                            </div>
-                          )}
-
-                          {/* Acceptance Criteria */}
-                          {item.acceptanceCriteria && item.acceptanceCriteria.length > 0 && (
-                            <div>
-                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Acceptance Criteria</h4>
-                              <ul className="space-y-1 bg-blue-50 p-3 rounded-lg">
-                                {item.acceptanceCriteria.map((criteria: string, j: number) => (
-                                  <li key={j} className="flex items-start text-sm">
-                                    <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
-                                    <span>{criteria}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {/* Technical Notes */}
-                          {item.technicalNotes && (
-                            <div>
-                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Technical Notes</h4>
-                              <p className="text-sm bg-gray-50 p-3 rounded-lg border-l-2 border-gray-400">
-                                {item.technicalNotes}
-                              </p>
-                            </div>
-                          )}
-
-                          {/* Dependencies */}
-                          {item.dependencies && item.dependencies.length > 0 && (
-                            <div>
-                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Dependencies</h4>
-                              <ul className="space-y-1 bg-yellow-50 p-3 rounded-lg">
-                                {item.dependencies.map((dep: string, j: number) => (
-                                  <li key={j} className="flex items-start text-sm">
-                                    <Clock className="h-4 w-4 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" />
-                                    <span>{dep}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {/* Risks */}
-                          {item.risks && item.risks.length > 0 && (
-                            <div>
-                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Risks</h4>
-                              <ul className="space-y-1 bg-red-50 p-3 rounded-lg">
-                                {item.risks.map((risk: string, j: number) => (
-                                  <li key={j} className="flex items-start text-sm">
-                                    <AlertCircle className="h-4 w-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" />
-                                    <span>{risk}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {/* Context (Legacy field) */}
-                          {item.context && (
-                            <div>
-                              <h4 className="text-sm font-semibold text-gray-700 mb-2">Context</h4>
-                              <p className="text-sm bg-gray-50 p-3 rounded-lg">{item.context}</p>
-                            </div>
+                            </details>
                           )}
                         </CardContent>
                       </Card>
