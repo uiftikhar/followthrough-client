@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { WatchInfo } from "@/lib/api/gmail-notifications-service";
 import { HttpClient } from "@/lib/api/http-client";
-import { useAnalytics } from "@/lib/analytics";
+import { useAnalytics } from "@/lib/vercel-analytics";
 
 interface GoogleAuthButtonProps {
   onAuthSuccess?: () => void;

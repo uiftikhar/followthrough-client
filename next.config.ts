@@ -15,14 +15,13 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BROWSER_API_URL: process.env.NEXT_PUBLIC_BROWSER_API_URL || "http://localhost:3001",
     NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001",
     NEXT_PUBLIC_BROWSER_WS_URL: process.env.NEXT_PUBLIC_BROWSER_WS_URL || "ws://localhost:3001",
-    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY || "",
     NEXT_PUBLIC_API_HOST: process.env.NEXT_PUBLIC_API_HOST || "localhost:3001",
     // GOOGLE_AUTH_CLIENT_ID: process.env.GOOGLE_AUTH_CLIENT_ID || "",
     // GOOGLE_AUTH_CLIENT_SECRET: process.env.GOOGLE_AUTH_CLIENT_SECRET || "",
     // NEXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID || "",
   },
 
-  // Add API proxy configuration and PostHog rewrites
+  // Add API proxy configuration
   async rewrites() {
     return [
       // Proxy meeting analysis API requests to the server
@@ -42,20 +41,8 @@ const nextConfig: NextConfig = {
         ],
         destination: "http://localhost:3001/api/:path*",
       },
-      // PostHog rewrites
-      {
-        source: "/ingest/static/:path*",
-        destination: "https://eu-assets.i.posthog.com/static/:path*",
-      },
-      {
-        source: "/ingest/:path*",
-        destination: "https://eu.i.posthog.com/:path*",
-      },
     ];
   },
-
-  // This is required to support PostHog trailing slash API requests
-  skipTrailingSlashRedirect: true,
 };
 
 export default nextConfig;

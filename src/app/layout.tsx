@@ -9,7 +9,7 @@ import { AuthProvider } from "../context/AuthContext";
 import { AuthCheck } from "@/components/auth-check";
 import { Toaster } from "@/components/ui/toaster";
 import Script from "next/script";
-import { PostHogProvider } from "@/providers/PostHogProvider";
+import { Analytics } from '@vercel/analytics/next';
 
 const inter = Inter({
   variable: "--font-sans",
@@ -53,26 +53,25 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: envScript }}
         />
 
-        <PostHogProvider>
-          <NextAuthProvider>
-            <ReactQueryProvider>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
-              >
-                <AuthProvider>
-                  <AuthCheck />
-                  <TranscriptProvider>
-                    {children}
-                    <Toaster />
-                  </TranscriptProvider>
-                </AuthProvider>
-              </ThemeProvider>
-            </ReactQueryProvider>
-          </NextAuthProvider>
-        </PostHogProvider>
+        <NextAuthProvider>
+          <ReactQueryProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <AuthProvider>
+                <AuthCheck />
+                <TranscriptProvider>
+                  {children}
+                  <Toaster />
+                  <Analytics />
+                </TranscriptProvider>
+              </AuthProvider>
+            </ThemeProvider>
+          </ReactQueryProvider>
+        </NextAuthProvider>
       </body>
     </html>
   );

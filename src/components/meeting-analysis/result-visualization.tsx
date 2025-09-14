@@ -36,7 +36,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useToast } from "@/hooks/use-toast";
-import { useAnalytics } from "@/lib/analytics";
+import { useAnalytics } from "@/lib/vercel-analytics";
 
 // Dynamically import AgentVisualization to avoid SSR issues
 const AgentVisualization = dynamic(

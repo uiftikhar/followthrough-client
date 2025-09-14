@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useAnalytics } from '@/lib/analytics';
+import { useAnalytics } from '@/lib/vercel-analytics';
 
 export function useSessionTracking() {
   const analytics = useAnalytics();

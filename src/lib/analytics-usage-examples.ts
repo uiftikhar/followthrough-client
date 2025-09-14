@@ -1,7 +1,7 @@
 // Analytics Usage Examples for Followthrough Client
-// This file contains examples of how to implement PostHog analytics throughout the app
+// This file contains examples of how to implement Vercel Analytics throughout the app
 
-import { useAnalytics } from './analytics';
+import { useAnalytics } from './vercel-analytics';
 
 // 1. USER AUTHENTICATION & ONBOARDING
 export function useAuthAnalytics() {
