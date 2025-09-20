@@ -9,6 +9,7 @@ import { AuthProvider } from "../context/AuthContext";
 import { AuthCheck } from "@/components/auth-check";
 import { Toaster } from "@/components/ui/toaster";
 import Script from "next/script";
+import { Analytics } from '@vercel/analytics/next';
 
 const inter = Inter({
   variable: "--font-sans",
@@ -65,6 +66,7 @@ export default function RootLayout({
                 <TranscriptProvider>
                   {children}
                   <Toaster />
+                  <Analytics />
                 </TranscriptProvider>
               </AuthProvider>
             </ThemeProvider>

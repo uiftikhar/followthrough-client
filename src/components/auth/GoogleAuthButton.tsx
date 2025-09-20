@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { WatchInfo } from "@/lib/api/gmail-notifications-service";
 import { HttpClient } from "@/lib/api/http-client";
+import { useAnalytics } from "@/lib/vercel-analytics";
 
 interface GoogleAuthButtonProps {
   onAuthSuccess?: () => void;
@@ -42,6 +43,7 @@ export function GoogleAuthButton({
     isConnected: false,
   });
   const [error, setError] = useState<string | null>(null);
+  const analytics = useAnalytics();
 
   // Load connection status on component mount
   useEffect(() => {
@@ -76,6 +78,9 @@ export function GoogleAuthButton({
       setIsLoading(true);
       setError(null);
 
+      // Track attempt
+      analytics.trackOnboardingStep('gmail_connection_attempted');
+
       const isAuth = await GoogleOAuthService.isAuthenticated();
       if (!isAuth) {
         throw new Error("Please log in first to connect Google services");
@@ -90,6 +95,13 @@ export function GoogleAuthButton({
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       setError(errorMessage);
+      
+      // Track error
+      analytics.trackGmailConnection(false);
+      analytics.trackError(error instanceof Error ? error : new Error(errorMessage), {
+        context: 'google_auth_initiate'
+      });
+      
       onAuthError?.(errorMessage);
     }
   };
@@ -124,9 +136,16 @@ export function GoogleAuthButton({
       setIsLoading(true);
       setError(null);
 
+      analytics.trackFeatureUsed('google_connection_test');
+
       const testResult = await GoogleOAuthService.testGoogleConnection();
 
       if (testResult.success) {
+        analytics.track('Google Connection Test Success', {
+          email: testResult.testResult?.email,
+          verified: testResult.testResult?.verified
+        });
+        
         alert(
           `Google connection works!\n\n` +
             `Email: ${testResult.testResult?.email}\n` +
@@ -141,6 +160,10 @@ export function GoogleAuthButton({
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       setError(errorMessage);
+      
+      analytics.trackError(error instanceof Error ? error : new Error(errorMessage), {
+        context: 'google_connection_test'
+      });
     } finally {
       setIsLoading(false);
     }

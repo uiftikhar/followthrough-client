@@ -26,9 +26,33 @@ import {
   Clock,
   ArrowUpCircle,
   ArrowDownCircle,
+  Edit,
+  ExternalLink,
+  User,
+  Calendar,
+  Tag,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+import { useToast } from "@/hooks/use-toast";
+import { useAnalytics } from "@/lib/vercel-analytics";
+
+// Dynamically import AgentVisualization to avoid SSR issues
+const AgentVisualization = dynamic(
+  () => import("../../app/meeting-analysis/[sessionId]/agent-visualization"),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2 text-gray-500">Loading visualization...</p>
+        </div>
+      </div>
+    )
+  }
+);
 
 interface ResultVisualizationProps {
   data: MeetingAnalysisResponse;
@@ -42,6 +66,8 @@ export function ResultVisualization({
   onRefresh,
 }: ResultVisualizationProps) {
   const [activeTab, setActiveTab] = useState("summary");
+  const { toast } = useToast();
+  const analytics = useAnalytics();
 
   // Helper function to get the actual data from results
   const getResultData = () => {
@@ -74,6 +100,26 @@ export function ResultVisualization({
 
   // Get the actual data
   const resultData = getResultData();
+
+  // Track page view and analysis completion
+  useEffect(() => {
+    if (resultData?.sessionId) {
+      analytics.trackPageView('meeting_analysis_results', {
+        session_id: resultData.sessionId,
+        status: resultData.status
+      });
+
+      if (resultData.status === 'completed') {
+        analytics.trackAnalysisCompleted({
+          session_id: resultData.sessionId,
+          topics_found: resultData.topics?.length || 0,
+          action_items_found: resultData.actionItems?.length || 0,
+          sentiment_analyzed: !!resultData.sentiment,
+          status: 'completed'
+        });
+      }
+    }
+  }, [resultData?.sessionId, resultData?.status, analytics]);
 
   // Show loading state
   if (isLoading && !resultData) {
@@ -272,11 +318,16 @@ export function ResultVisualization({
         </Alert>
       )}
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-4 grid grid-cols-4">
+      <Tabs value={activeTab} onValueChange={(newTab) => {
+        // Track tab switches
+        analytics.trackTabSwitch(activeTab, newTab, resultData?.sessionId);
+        setActiveTab(newTab);
+      }}>
+        <TabsList className="mb-4 grid grid-cols-5">
           <TabsTrigger value="summary">Summary</TabsTrigger>
           <TabsTrigger value="topics">Topics</TabsTrigger>
           <TabsTrigger value="action-items">Action Items</TabsTrigger>
+          <TabsTrigger value="visualization">Visualization</TabsTrigger>
           <TabsTrigger value="sentiment">Sentiment</TabsTrigger>
         </TabsList>
 
@@ -443,57 +494,208 @@ export function ResultVisualization({
         <TabsContent value="action-items">
           <Card>
             <CardHeader>
-              <CardTitle>Action Items</CardTitle>
-              <CardDescription>
-                {resultData?.actionItems
-                  ? `${resultData.actionItems.length} action items identified`
-                  : "No action items identified yet"}
-              </CardDescription>
+              <div className="flex items-start justify-between">
+                <div>
+                  <CardTitle>Action Items</CardTitle>
+                  <CardDescription>
+                    {resultData?.actionItems
+                      ? `${resultData.actionItems.length} action items identified`
+                      : "No action items identified yet"}
+                  </CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      analytics.trackFeatureUsed('action_items_edit_clicked');
+                      toast({
+                        title: "Edit Mode",
+                        description: "Edit functionality will be available soon. You'll be able to modify action items directly.",
+                      });
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Edit
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      const itemCount = resultData?.actionItems?.length || 0;
+                      analytics.trackJiraPush(itemCount, false, 'Not implemented yet');
+                      analytics.trackFeatureUsed('jira_push_clicked', {
+                        action_items_count: itemCount
+                      });
+                      
+                      toast({
+                        title: "Push to Jira",
+                        description: `Preparing to push ${itemCount} action items to Jira...`,
+                      });
+                      // TODO: Implement actual Jira integration
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Push to Jira
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {resultData?.actionItems && resultData.actionItems.length > 0 ? (
-                <ScrollArea className="h-[500px] pr-4">
-                  <div className="space-y-4">
+                <ScrollArea className="h-[600px] pr-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {resultData.actionItems.map((item, i) => (
-                      <Card key={i}>
-                        <CardHeader className="py-3">
-                          <div className="flex items-start justify-between">
-                            <CardTitle className="text-lg">
-                              {item.description}
-                            </CardTitle>
-                            <div className="flex gap-2">
-                              {getPriorityBadge(item.priority)}
-                              {getActionStatusBadge(item.status)}
+                      <Card key={i} className="hover:shadow-lg transition-shadow duration-200 border border-gray-200 bg-white">
+                        <CardContent className="p-4">
+                          {/* Title */}
+                          <div className="mb-3">
+                            <h3 className="text-sm font-medium text-gray-900 leading-tight line-clamp-2">
+                              {item.title || item.description}
+                            </h3>
+                          </div>
+
+                          {/* Component/Epic Badge */}
+                          <div className="mb-3 flex flex-wrap gap-1">
+                            {item.component && (
+                              <Badge 
+                                className="text-xs px-2 py-1 bg-orange-100 text-orange-800 hover:bg-orange-100"
+                                variant="secondary"
+                              >
+                                {item.component}
+                              </Badge>
+                            )}
+                            {item.epic && (
+                              <Badge 
+                                className="text-xs px-2 py-1 bg-blue-100 text-blue-800 hover:bg-blue-100"
+                                variant="secondary"
+                              >
+                                {item.epic}
+                              </Badge>
+                            )}
+                            {item.ticketType && (
+                              <Badge 
+                                className="text-xs px-2 py-1 bg-purple-100 text-purple-800 hover:bg-purple-100"
+                                variant="secondary"
+                              >
+                                {item.ticketType}
+                              </Badge>
+                            )}
+                          </div>
+
+                          {/* Status and Priority Row */}
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              {/* Status */}
+                              {item.status && (
+                                <div className="flex items-center gap-1">
+                                  <div className={`w-2 h-2 rounded-full ${
+                                    item.status.toLowerCase() === 'completed' ? 'bg-green-500' :
+                                    item.status.toLowerCase() === 'in_progress' ? 'bg-blue-500' :
+                                    item.status.toLowerCase() === 'pending' ? 'bg-gray-400' :
+                                    'bg-red-500'
+                                  }`} />
+                                  <span className="text-xs text-gray-600 capitalize">
+                                    {item.status.replace('_', ' ')}
+                                  </span>
+                                </div>
+                              )}
+                              
+                              {/* Priority */}
+                              {item.priority && (
+                                <div className="flex items-center gap-1">
+                                  {item.priority.toLowerCase() === 'high' && <ArrowUpCircle className="h-3 w-3 text-red-500" />}
+                                  {item.priority.toLowerCase() === 'medium' && <ArrowUpCircle className="h-3 w-3 text-yellow-500" />}
+                                  {item.priority.toLowerCase() === 'low' && <ArrowDownCircle className="h-3 w-3 text-green-500" />}
+                                  <span className="text-xs text-gray-600">{item.priority}</span>
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Story Points */}
+                            {item.storyPoints && (
+                              <div className="text-xs text-gray-500 font-medium">
+                                {item.storyPoints}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Bottom Row - Assignee and Ticket ID */}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              {item.assignee && (
+                                <>
+                                  <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                                    <User className="h-3 w-3 text-gray-600" />
+                                  </div>
+                                  <span className="text-xs text-gray-600">{item.assignee}</span>
+                                </>
+                              )}
+                            </div>
+                            
+                            {/* Mock Ticket ID */}
+                            <div className="text-xs text-gray-500 font-mono">
+                              TIS-{(i + 1).toString().padStart(2, '0')}
                             </div>
                           </div>
-                        </CardHeader>
-                        <CardContent className="py-2">
-                          <div className="grid grid-cols-2 gap-4">
-                            {item.assignee && (
-                              <div>
-                                <h4 className="text-sm font-medium">
-                                  Assignee
-                                </h4>
-                                <p>{item.assignee}</p>
-                              </div>
-                            )}
 
-                            {item.deadline && (
-                              <div>
-                                <h4 className="text-sm font-medium">
-                                  Due Date
-                                </h4>
-                                <p>{item.deadline}</p>
-                              </div>
-                            )}
+                          {/* Expandable Details (Hidden by default, can be toggled) */}
+                          {(item.businessValue || item.acceptanceCriteria || item.technicalNotes || 
+                            item.dependencies || item.risks || item.labels) && (
+                            <details className="mt-3 group">
+                              <summary className="text-xs text-blue-600 cursor-pointer hover:text-blue-800 list-none">
+                                <span className="group-open:hidden">Show details</span>
+                                <span className="hidden group-open:inline">Hide details</span>
+                              </summary>
+                              
+                              <div className="mt-2 pt-2 border-t border-gray-100 space-y-2">
+                                {/* Business Value */}
+                                {item.businessValue && (
+                                  <div>
+                                    <h5 className="text-xs font-semibold text-gray-700 mb-1">Business Value</h5>
+                                    <p className="text-xs text-gray-600 bg-green-50 p-2 rounded">{item.businessValue}</p>
+                                  </div>
+                                )}
 
-                            {item.context && (
-                              <div className="col-span-2">
-                                <h4 className="text-sm font-medium">Context</h4>
-                                <p>{item.context}</p>
+                                {/* Acceptance Criteria */}
+                                {item.acceptanceCriteria && item.acceptanceCriteria.length > 0 && (
+                                  <div>
+                                    <h5 className="text-xs font-semibold text-gray-700 mb-1">Acceptance Criteria</h5>
+                                    <ul className="text-xs text-gray-600 space-y-1">
+                                      {item.acceptanceCriteria.slice(0, 3).map((criteria: string, j: number) => (
+                                        <li key={j} className="flex items-start">
+                                          <CheckCircle2 className="h-3 w-3 text-green-500 mr-1 mt-0.5 flex-shrink-0" />
+                                          <span>{criteria}</span>
+                                        </li>
+                                      ))}
+                                      {item.acceptanceCriteria.length > 3 && (
+                                        <li className="text-gray-500">+{item.acceptanceCriteria.length - 3} more...</li>
+                                      )}
+                                    </ul>
+                                  </div>
+                                )}
+
+                                {/* Labels */}
+                                {item.labels && item.labels.length > 0 && (
+                                  <div>
+                                    <h5 className="text-xs font-semibold text-gray-700 mb-1">Labels</h5>
+                                    <div className="flex flex-wrap gap-1">
+                                      {item.labels.slice(0, 4).map((label: string, j: number) => (
+                                        <Badge key={j} variant="outline" className="text-xs px-1 py-0">
+                                          {label}
+                                        </Badge>
+                                      ))}
+                                      {item.labels.length > 4 && (
+                                        <span className="text-xs text-gray-500">+{item.labels.length - 4}</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
-                            )}
-                          </div>
+                            </details>
+                          )}
                         </CardContent>
                       </Card>
                     ))}
@@ -506,6 +708,32 @@ export function ResultVisualization({
                     ? "Action items are still being extracted..."
                     : "No action items were identified in this meeting."}
                 </p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="visualization">
+          <Card>
+            <CardHeader>
+              <CardTitle>Agent Visualization</CardTitle>
+              <CardDescription>
+                Interactive visualization of the meeting analysis process and relationships
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {resultData?.sessionId ? (
+                <div onMouseEnter={() => {
+                  analytics.trackFeatureUsed('agent_visualization_viewed', {
+                    session_id: resultData.sessionId
+                  });
+                }}>
+                  <AgentVisualization sessionId={resultData.sessionId} />
+                </div>
+              ) : (
+                <div className="py-8 text-center text-gray-500">
+                  <p>Visualization not available - Session ID missing</p>
+                </div>
               )}
             </CardContent>
           </Card>
