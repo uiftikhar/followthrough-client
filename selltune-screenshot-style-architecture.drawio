@@ -1,0 +1,182 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" version="28.2.3">
+  <diagram name="Selltune Lead Management System Architecture" id="selltune-architecture">
+    <mxGraphModel dx="1604" dy="1501" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="Selltune Lead Management System Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Arial;fontSize=14;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="300" y="10" width="400" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- TOP ROW - Following Screenshot Layout -->
+        
+        <!-- Development Team (Top Left) -->
+        <mxCell id="dev-team" value="Development Team&lt;br&gt;40,000+ Dealerships" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="50" y="50" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- OCI Pipeline (Top Center Left) -->
+        <mxCell id="oci-pipeline" value="OCI Pipeline&lt;br&gt;Docker Images" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="180" y="50" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Monitoring (Top Center) -->
+        <mxCell id="monitoring" value="Monitoring&lt;br&gt;Grafana" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="310" y="50" width="80" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Infrastructure Management (Top Center Right) -->
+        <mxCell id="infra-mgmt" value="Infrastructure&lt;br&gt;Management" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="420" y="50" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Superset UI (Top Right) -->
+        <mxCell id="superset-ui" value="Superset UI&lt;br&gt;Analytics Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="550" y="50" width="110" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- React Client (Top Far Right) -->
+        <mxCell id="react-client" value="React Client&lt;br&gt;Lead Management UI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="690" y="50" width="110" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- MIDDLE ROW - Central Architecture -->
+
+        <!-- Mobile.de Main Platform (Left) -->
+        <mxCell id="mobile-main-platform" value="Mobile.de Main Platform&lt;br&gt;Lead Management&lt;br&gt;Core System" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="50" y="140" width="130" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- DevOps Team Services (Center Left) -->
+        <mxCell id="devops-team" value="DevOps Team&lt;br&gt;Services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="200" y="140" width="80" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Apache HTTP Server (CENTER - Main Component) -->
+        <mxCell id="apache-server" value="Apache HTTP Server&lt;br&gt;Reverse Proxy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontFamily=Arial;fontSize=11;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="300" y="140" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- API Store Middleware (Center Right) -->
+        <mxCell id="api-store-middleware" value="API Store Middleware&lt;br&gt;Request Processing&lt;br&gt;Lead Management" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="480" y="140" width="130" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Reverse Proxy (Right) -->
+        <mxCell id="reverse-proxy" value="Reverse Proxy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="640" y="140" width="90" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Other Micro Frontends (Far Right) -->
+        <mxCell id="other-micro-frontends" value="Other Micro Frontends&lt;br&gt;Dealer Portal&lt;br&gt;Analytics Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="750" y="140" width="130" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- BOTTOM ROW - Service Layer -->
+
+        <!-- Gateway Layer (Bottom Left) -->
+        <mxCell id="gateway-layer" value="Gateway Layer&lt;br&gt;API Management&lt;br&gt;Load Balancing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="50" y="260" width="110" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Routing Engine (Bottom Center Left) -->
+        <mxCell id="routing-engine" value="Routing Engine&lt;br&gt;Rule Analytics&lt;br&gt;Lead Distribution" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="180" y="260" width="110" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Dealer Micro Frontends (Bottom Center) -->
+        <mxCell id="dealer-micro-frontends" value="Dealer Micro Frontends&lt;br&gt;Portal Management&lt;br&gt;Territory Assignment" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="310" y="260" width="130" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Secured Services (Bottom Center Right) -->
+        <mxCell id="secured-services" value="Secured Services&lt;br&gt;Config Management" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1;fontFamily=Arial;fontSize=10;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="460" y="260" width="110" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- CONNECTIONS - Matching Screenshot Style -->
+
+        <!-- Top Row Connections (Dashed - User Interactions) -->
+        <mxCell id="conn1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;endArrow=classic;endSize=4;dashed=1;" parent="1" source="dev-team" target="oci-pipeline" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;endArrow=classic;endSize=4;" parent="1" source="oci-pipeline" target="monitoring" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;endArrow=classic;endSize=4;" parent="1" source="monitoring" target="infra-mgmt" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;endArrow=classic;endSize=4;" parent="1" source="infra-mgmt" target="superset-ui" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;endArrow=classic;endSize=4;" parent="1" source="superset-ui" target="react-client" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Main Data Flow (Thick Lines) -->
+        <mxCell id="conn6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#0066cc;endArrow=classic;endSize=6;" parent="1" source="mobile-main-platform" target="apache-server" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;endArrow=classic;endSize=4;" parent="1" source="devops-team" target="apache-server" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#0066cc;endArrow=classic;endSize=6;" parent="1" source="apache-server" target="api-store-middleware" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;endArrow=classic;endSize=4;" parent="1" source="api-store-middleware" target="reverse-proxy" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;endArrow=classic;endSize=4;" parent="1" source="reverse-proxy" target="other-micro-frontends" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- React Client Connection -->
+        <mxCell id="conn11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;endArrow=classic;endSize=4;" parent="1" source="react-client" target="other-micro-frontends" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Bottom Layer Connections -->
+        <mxCell id="conn12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;endArrow=classic;endSize=4;" parent="1" source="gateway-layer" target="routing-engine" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;endArrow=classic;endSize=4;" parent="1" source="routing-engine" target="dealer-micro-frontends" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;endArrow=classic;endSize=4;" parent="1" source="dealer-micro-frontends" target="secured-services" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- User Icon (Left Side) -->
+        <mxCell id="users-icon" value="" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="10" y="180" width="25" height="35" as="geometry" />
+        </mxCell>
+
+        <mxCell id="users-label" value="Selltune Users" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Arial;fontSize=9;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="-5" y="220" width="55" height="15" as="geometry" />
+        </mxCell>
+
+        <!-- User to System Connection -->
+        <mxCell id="user-conn" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;endArrow=classic;endSize=4;dashed=1;" parent="1" source="users-icon" target="mobile-main-platform" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="user-conn2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#666666;endArrow=classic;endSize=4;dashed=1;" parent="1" source="users-icon" target="gateway-layer" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

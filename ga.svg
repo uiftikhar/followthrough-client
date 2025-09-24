@@ -1,0 +1,106 @@
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="400" fill="#ffffff"/>
+  
+  <!-- Header -->
+  <rect width="800" height="32" fill="#202124"/>
+  <text x="10" y="22" fill="white" font-family="Arial, sans-serif" font-size="12">Google Analytics</text>
+  <text x="10" y="10" fill="#9aa0a6" font-family="Arial, sans-serif" font-size="10">https://analytics.google.com/analytics/web/#/report-home</text>
+  
+  <!-- Left Sidebar -->
+  <rect x="0" y="32" width="80" height="368" fill="#f8f9fa"/>
+  
+  <!-- Sidebar items -->
+  <text x="10" y="60" fill="#1a73e8" font-family="Arial, sans-serif" font-size="11">Real-time</text>
+  <text x="10" y="85" fill="#5f6368" font-family="Arial, sans-serif" font-size="11" font-weight="bold">Reports</text>
+  <text x="15" y="110" fill="#5f6368" font-family="Arial, sans-serif" font-size="10">Engagement</text>
+  <text x="10" y="140" fill="#5f6368" font-family="Arial, sans-serif" font-size="11">Explore</text>
+  <text x="10" y="165" fill="#5f6368" font-family="Arial, sans-serif" font-size="11">Advertising</text>
+  <text x="10" y="190" fill="#5f6368" font-family="Arial, sans-serif" font-size="11">Configure</text>
+  
+  <!-- Main content area -->
+  <rect x="80" y="32" width="720" height="368" fill="#ffffff"/>
+  
+  <!-- Breadcrumb -->
+  <text x="95" y="55" fill="#5f6368" font-family="Arial, sans-serif" font-size="11">Reports > Engagement > Overview</text>
+  
+  <!-- Title -->
+  <text x="95" y="85" fill="#202124" font-family="Arial, sans-serif" font-size="18" font-weight="500">Engagement overview</text>
+  
+  <!-- Date range -->
+  <rect x="650" y="70" width="130" height="28" rx="4" fill="#ffffff" stroke="#dadce0"/>
+  <text x="660" y="87" fill="#5f6368" font-family="Arial, sans-serif" font-size="11">Jan 1, 2021 - Dec 31, 2021</text>
+  
+  <!-- Users label -->
+  <text x="110" y="115" fill="#202124" font-family="Arial, sans-serif" font-size="13" font-weight="500">Users</text>
+  
+  <!-- Y-axis labels -->
+  <text x="95" y="155" fill="#5f6368" font-family="Arial, sans-serif" font-size="10">4K</text>
+  <text x="95" y="195" fill="#5f6368" font-family="Arial, sans-serif" font-size="10">3K</text>
+  <text x="95" y="235" fill="#5f6368" font-family="Arial, sans-serif" font-size="10">2K</text>
+  <text x="95" y="275" fill="#5f6368" font-family="Arial, sans-serif" font-size="10">1K</text>
+  <text x="95" y="315" fill="#5f6368" font-family="Arial, sans-serif" font-size="10">0</text>
+  
+  <!-- Grid lines -->
+  <line x1="110" y1="150" x2="760" y2="150" stroke="#e8eaed" stroke-width="1"/>
+  <line x1="110" y1="190" x2="760" y2="190" stroke="#e8eaed" stroke-width="1"/>
+  <line x1="110" y1="230" x2="760" y2="230" stroke="#e8eaed" stroke-width="1"/>
+  <line x1="110" y1="270" x2="760" y2="270" stroke="#e8eaed" stroke-width="1"/>
+  <line x1="110" y1="310" x2="760" y2="310" stroke="#e8eaed" stroke-width="1"/>
+  
+  <!-- X-axis labels -->
+  <text x="130" y="330" fill="#5f6368" font-family="Arial, sans-serif" font-size="10">Jan 2021</text>
+  <text x="230" y="330" fill="#5f6368" font-family="Arial, sans-serif" font-size="10">Mar 2021</text>
+  <text x="330" y="330" fill="#5f6368" font-family="Arial, sans-serif" font-size="10">May 2021</text>
+  <text x="430" y="330" fill="#5f6368" font-family="Arial, sans-serif" font-size="10">Jul 2021</text>
+  <text x="530" y="330" fill="#5f6368" font-family="Arial, sans-serif" font-size="10">Sep 2021</text>
+  <text x="630" y="330" fill="#5f6368" font-family="Arial, sans-serif" font-size="10">Nov 2021</text>
+  <text x="720" y="330" fill="#5f6368" font-family="Arial, sans-serif" font-size="10">Jan 2022</text>
+  
+  <!-- Area chart fill -->
+  <defs>
+    <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4285f4;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#4285f4;stop-opacity:0.05"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Chart area path -->
+  <path d="M 110 300 
+           L 120 298 L 125 297 L 130 298 L 135 299 L 140 298 L 145 297 L 150 296 L 155 297 L 160 298
+           L 165 299 L 170 298 L 175 296 L 180 294 L 185 292 L 190 290 L 195 288 L 200 285 L 205 283
+           L 210 285 L 215 287 L 220 289 L 225 290 L 230 288 L 235 286 L 240 284 L 245 283 L 250 285
+           L 255 287 L 260 286 L 265 284 L 270 282 L 275 280 L 280 278 L 285 276 L 290 274 L 295 272
+           L 300 270 L 305 268 L 310 266 L 315 264 L 320 262 L 325 260 L 330 258 L 335 256 L 340 254
+           L 345 252 L 350 250 L 355 248 L 360 246 L 365 244 L 370 242 L 375 240 L 380 238 L 385 236
+           L 390 234 L 395 232 L 400 230 L 405 228 L 410 226 L 415 224 L 420 222 L 425 220 L 430 218
+           L 435 216 L 440 214 L 445 212 L 450 210 L 455 208 L 460 206 L 465 204 L 470 202 L 475 200
+           L 480 198 L 485 196 L 490 194 L 495 192 L 500 190 L 505 188 L 510 186 L 515 184 L 520 182
+           L 525 180 L 530 178 L 535 176 L 540 174 L 545 172 L 550 170 L 555 168 L 560 166 L 565 164
+           L 570 162 L 575 160 L 580 158 L 585 156 L 590 154 L 595 152 L 600 150 L 605 152 L 610 154
+           L 615 156 L 620 158 L 625 160 L 630 162 L 635 164 L 640 166 L 645 168 L 650 170 L 655 172
+           L 660 174 L 665 176 L 670 178 L 675 180 L 680 182 L 685 184 L 690 186 L 695 188 L 700 190
+           L 705 192 L 710 194 L 715 196 L 720 198 L 725 200 L 730 202 L 735 204 L 740 206 L 745 208
+           L 750 210 L 755 212 L 760 214
+           L 760 310 L 110 310 Z" 
+        fill="url(#areaGradient)"/>
+  
+  <!-- Chart line -->
+  <path d="M 110 300 
+           L 120 298 L 125 297 L 130 298 L 135 299 L 140 298 L 145 297 L 150 296 L 155 297 L 160 298
+           L 165 299 L 170 298 L 175 296 L 180 294 L 185 292 L 190 290 L 195 288 L 200 285 L 205 283
+           L 210 285 L 215 287 L 220 289 L 225 290 L 230 288 L 235 286 L 240 284 L 245 283 L 250 285
+           L 255 287 L 260 286 L 265 284 L 270 282 L 275 280 L 280 278 L 285 276 L 290 274 L 295 272
+           L 300 270 L 305 268 L 310 266 L 315 264 L 320 262 L 325 260 L 330 258 L 335 256 L 340 254
+           L 345 252 L 350 250 L 355 248 L 360 246 L 365 244 L 370 242 L 375 240 L 380 238 L 385 236
+           L 390 234 L 395 232 L 400 230 L 405 228 L 410 226 L 415 224 L 420 222 L 425 220 L 430 218
+           L 435 216 L 440 214 L 445 212 L 450 210 L 455 208 L 460 206 L 465 204 L 470 202 L 475 200
+           L 480 198 L 485 196 L 490 194 L 495 192 L 500 190 L 505 188 L 510 186 L 515 184 L 520 182
+           L 525 180 L 530 178 L 535 176 L 540 174 L 545 172 L 550 170 L 555 168 L 560 166 L 565 164
+           L 570 162 L 575 160 L 580 158 L 585 156 L 590 154 L 595 152 L 600 150 L 605 152 L 610 154
+           L 615 156 L 620 158 L 625 160 L 630 162 L 635 164 L 640 166 L 645 168 L 650 170 L 655 172
+           L 660 174 L 665 176 L 670 178 L 675 180 L 680 182 L 685 184 L 690 186 L 695 188 L 700 190
+           L 705 192 L 710 194 L 715 196 L 720 198 L 725 200 L 730 202 L 735 204 L 740 206 L 745 208
+           L 750 210 L 755 212 L 760 214" 
+        stroke="#4285f4" stroke-width="2" fill="none"/>
+</svg>

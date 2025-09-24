@@ -1,0 +1,431 @@
+graph TB
+    %% Client Layer
+    Browser[Web Browser]
+
+    %% Frontend Layer
+    subgraph "Frontend (Angular 16)"
+        WebApp[Angular WebApp<br/>Port: 4200]
+
+        subgraph "Core Modules"
+            AppModule[App Module]
+            CoreModule[Core Module]
+            SharedModule[Shared Module]
+        end
+
+        subgraph "Feature Modules"
+            subgraph "Lead Management Module"
+                LeadComponent[Lead Component]
+                LeadService[Lead Service]
+                LeadGuard[Lead Route Guard]
+                LeadResolver[Lead Resolver]
+                LeadInterceptor[Lead HTTP Interceptor]
+                LeadValidator[Lead Form Validator]
+                LeadPipe[Lead Status Pipe]
+                LeadDirective[Lead Highlight Directive]
+                LeadModel[Lead Data Model]
+                LeadRepository[Lead Repository]
+                LeadCache[Lead Cache Service]
+                LeadWebSocket[Lead Real-time Updates]
+            end
+
+            subgraph "Dealer Management Module"
+                DealerComponent[Dealer Component]
+                DealerService[Dealer Service]
+                DealerGuard[Dealer Access Guard]
+                DealerResolver[Dealer Resolver]
+                DealerInterceptor[Dealer API Interceptor]
+                DealerValidator[Dealer Validation Service]
+                DealerPipe[Dealer Status Pipe]
+                DealerDirective[Territory Directive]
+                DealerModel[Dealer Data Model]
+                DealerRepository[Dealer Repository]
+                DealerCache[Dealer Cache Service]
+                DealerAnalytics[Dealer Analytics Service]
+            end
+
+            subgraph "Mismatch Detection Module"
+                MismatchComponent[Mismatch Dashboard]
+                MismatchService[Mismatch Detection Service]
+                MismatchGuard[Mismatch Access Guard]
+                MismatchResolver[Mismatch Data Resolver]
+                MismatchInterceptor[Mismatch API Handler]
+                MismatchValidator[Data Validation Service]
+                MismatchPipe[Severity Pipe]
+                MismatchDirective[Alert Directive]
+                MismatchModel[Mismatch Record Model]
+                MismatchRepository[Mismatch Repository]
+                MismatchML[ML Detection Engine]
+                MismatchQueue[Processing Queue]
+            end
+
+            subgraph "Fraud Detection Module"
+                FraudComponent[Fraud Dashboard]
+                FraudService[Fraud Detection Service]
+                FraudGuard[Security Guard]
+                FraudResolver[Fraud Case Resolver]
+                FraudInterceptor[Security Interceptor]
+                FraudValidator[Risk Validator]
+                FraudPipe[Risk Score Pipe]
+                FraudDirective[Security Alert Directive]
+                FraudModel[Fraud Case Model]
+                FraudRepository[Fraud Repository]
+                FraudAI[AI Risk Engine]
+                FraudAlert[Alert System]
+            end
+
+            subgraph "Retention Management Module"
+                RetentionComponent[Retention Dashboard]
+                RetentionService[Retention Service]
+                RetentionGuard[Retention Guard]
+                RetentionResolver[Customer Resolver]
+                RetentionInterceptor[Retention API Handler]
+                RetentionValidator[Campaign Validator]
+                RetentionPipe[Engagement Pipe]
+                RetentionDirective[Campaign Directive]
+                RetentionModel[Retention Model]
+                RetentionRepository[Retention Repository]
+                RetentionEngine[Retention Engine]
+                RetentionCRM[CRM Integration]
+            end
+
+            subgraph "Seller Management Module"
+                SellerComponent[Seller Portal]
+                SellerService[Seller Service]
+                SellerGuard[Seller Access Guard]
+                SellerResolver[Seller Profile Resolver]
+                SellerInterceptor[Seller API Handler]
+                SellerValidator[Profile Validator]
+                SellerPipe[Performance Pipe]
+                SellerDirective[Commission Directive]
+                SellerModel[Seller Profile Model]
+                SellerRepository[Seller Repository]
+                SellerPerformance[Performance Analytics]
+                SellerCommission[Commission Calculator]
+            end
+
+            subgraph "Tracking & Analytics Module"
+                TrackingComponent[Analytics Dashboard]
+                TrackingService[Tracking Service]
+                TrackingGuard[Analytics Guard]
+                TrackingResolver[Metrics Resolver]
+                TrackingInterceptor[Analytics Interceptor]
+                TrackingValidator[Data Validator]
+                TrackingPipe[Metrics Pipe]
+                TrackingDirective[Chart Directive]
+                TrackingModel[Analytics Model]
+                TrackingRepository[Metrics Repository]
+                TrackingEngine[Analytics Engine]
+                TrackingBI[Business Intelligence]
+            end
+
+            subgraph "ER Export Module"
+                ErComponent[Export Interface]
+                ErService[Export Service]
+                ErGuard[Export Permission Guard]
+                ErResolver[Export Data Resolver]
+                ErInterceptor[Export API Handler]
+                ErValidator[Export Validator]
+                ErPipe[Format Pipe]
+                ErDirective[Progress Directive]
+                ErModel[Export Job Model]
+                ErRepository[Export Repository]
+                ErProcessor[Batch Processor]
+                ErScheduler[Export Scheduler]
+            end
+        end
+
+        subgraph "Services & Guards"
+            AuthGuard[Auth Guard/SSO]
+            ApiServices[API Services]
+            Interceptors[HTTP Interceptors]
+        end
+    end
+
+    %% Backend Layer
+    subgraph "Backend (Node.js/Express)"
+        Server[Express Server<br/>Port: 3000]
+
+        subgraph "Core Services"
+            AuthService[SSO Authentication Service<br/>@Injectable @Singleton]
+            LeadService[Lead Management Service<br/>@Service @Transactional]
+            DealerService[Dealer Management Service<br/>@Service @Cacheable]
+            BatchProcess[Lead Batch Processing<br/>@Component @Scheduled]
+            ApiProxy[API Gateway Proxy<br/>@Controller @RateLimit]
+            MonitoringService[Monitoring & Metrics<br/>@Service @Async]
+            ValidationService[Data Validation Service<br/>@Component @Validator]
+            CacheService[Redis Cache Service<br/>@Service @CacheManager]
+            QueueService[Message Queue Service<br/>@Service @RabbitMQ]
+            NotificationService[Notification Service<br/>@Service @EventListener]
+        end
+
+        subgraph "Data Access Layer"
+            LeadRepository[Lead Repository<br/>@Repository @Entity-Lead]
+            DealerRepository[Dealer Repository<br/>@Repository @Entity-Dealer]
+            UserRepository[User Repository<br/>@Repository @Entity-User]
+            AuditRepository[Audit Repository<br/>@Repository @Entity-Audit]
+            AnalyticsRepository[Analytics Repository<br/>@Repository @TimeSeriesData]
+            CacheRepository[Cache Repository<br/>@Repository @RedisTemplate]
+        end
+
+        subgraph "Business Logic Layer"
+            LeadBusinessLogic[Lead Business Logic<br/>@BusinessService @Validated]
+            DealerBusinessLogic[Dealer Business Logic<br/>@BusinessService @Secured]
+            FraudDetectionLogic[Fraud Detection Logic<br/>@MLService @RealTime]
+            MismatchDetectionLogic[Mismatch Detection Logic<br/>@AIService @BatchProcessor]
+            RetentionLogic[Retention Logic<br/>@CampaignService @Automated]
+            AnalyticsLogic[Analytics Logic<br/>@ReportingService @Aggregated]
+        end
+
+        subgraph "Integration Services"
+            MobileDeAPI[Mobile.de API Integration<br/>@ExternalService @CircuitBreaker]
+            EmailService[Email Service Integration<br/>@NotificationService @SMTP]
+            SMSService[SMS Service Integration<br/>@NotificationService @Twilio]
+            CRMService[CRM Integration Service<br/>@ExternalService @Salesforce]
+            PaymentService[Payment Processing<br/>@PaymentService @Stripe]
+            GeoService[Geolocation Service<br/>@LocationService @GoogleMaps]
+        end
+
+        subgraph "Utilities"
+            Logger[Centralized Logger<br/>@Logger @Winston]
+            EnvConfig[Environment Configuration<br/>@Configuration @Properties]
+            StaticServing[Static File Serving<br/>@StaticResource @CDN]
+            PhoneFormatter[Phone Number Formatter<br/>@Formatter @International]
+            Zip2City[ZIP to City Service<br/>@GeoService @Cached]
+            FileUploadService[File Upload Service<br/>@FileService @S3]
+            SecurityService[Security Service<br/>@Security @JWT]
+            RateLimitService[Rate Limiting Service<br/>@RateLimit @Redis]
+        end
+    end
+
+    %% Development Tools
+    subgraph "Development Environment"
+        ApiMock[API Mock Server<br/>Mock Data & Endpoints]
+    end
+
+    %% Data Storage Layer
+    subgraph "Data Storage & Databases"
+        PostgresMain[(PostgreSQL Main DB<br/>Lead & Dealer Data<br/>40,000+ Dealerships)]
+        PostgresAnalytics[(PostgreSQL Analytics DB<br/>Time Series Data<br/>Performance Metrics)]
+        RedisCache[(Redis Cluster<br/>Session Cache<br/>Real-time Data)]
+        ElasticSearch[(Elasticsearch<br/>Search & Indexing<br/>Log Aggregation)]
+        MongoDB[(MongoDB<br/>Document Storage<br/>Unstructured Data)]
+        S3Storage[(AWS S3<br/>File Storage<br/>Export Archives)]
+    end
+
+    %% External Dependencies
+    subgraph "External Services & APIs"
+        SSOProvider[Adevinta SSO<br/>Enterprise Authentication<br/>SAML/OAuth2]
+        MobileDeExternal[Mobile.de External API<br/>Vehicle Data Integration<br/>Real-time Inventory]
+        SalesforceAPI[Salesforce CRM API<br/>Customer Management<br/>Sales Pipeline]
+        StripeAPI[Stripe Payment API<br/>Payment Processing<br/>Subscription Management]
+        TwilioAPI[Twilio Communications<br/>SMS & Voice Services<br/>Notifications]
+        GoogleMapsAPI[Google Maps API<br/>Geolocation Services<br/>Territory Management]
+        SendGridAPI[SendGrid Email API<br/>Email Campaigns<br/>Transactional Emails]
+        SlackAPI[Slack Integration<br/>Team Notifications<br/>Alert System]
+    end
+
+    %% Monitoring & Observability
+    subgraph "Monitoring & Observability"
+        Grafana[Grafana Dashboards<br/>Business Metrics<br/>Real-time Monitoring]
+        Kibana[Kibana Analytics<br/>Log Analysis<br/>Search Interface]
+        Prometheus[Prometheus Metrics<br/>System Monitoring<br/>Alerting Rules]
+        Jaeger[Jaeger Tracing<br/>Distributed Tracing<br/>Performance Analysis]
+        Sentry[Sentry Error Tracking<br/>Error Monitoring<br/>Performance Insights]
+        DataDog[DataDog APM<br/>Application Performance<br/>Infrastructure Monitoring]
+    end
+
+    %% Infrastructure & DevOps
+    subgraph "Infrastructure & DevOps"
+        Kubernetes[Kubernetes Cluster<br/>Container Orchestration<br/>Auto-scaling]
+        Docker[Docker Containers<br/>Application Packaging<br/>Microservices]
+        Jenkins[Jenkins CI/CD<br/>Automated Deployment<br/>Pipeline Management]
+        QuayRegistry[Quay Container Registry<br/>Image Storage<br/>Security Scanning]
+        Terraform[Terraform IaC<br/>Infrastructure as Code<br/>Cloud Provisioning]
+        Ansible[Ansible Configuration<br/>Configuration Management<br/>Deployment Automation]
+        LoadBalancer[AWS Load Balancer<br/>Traffic Distribution<br/>High Availability]
+        CloudFront[CloudFront CDN<br/>Global Content Delivery<br/>Static Asset Caching]
+    end
+
+    %% Message Queue & Event Streaming
+    subgraph "Message Queue & Event Streaming"
+        RabbitMQ[RabbitMQ<br/>Message Broker<br/>Async Processing]
+        Kafka[Apache Kafka<br/>Event Streaming<br/>Real-time Data Pipeline]
+        Redis_Queue[Redis Queue<br/>Job Processing<br/>Background Tasks]
+    end
+
+    %% === PRIMARY USER FLOW ===
+    Browser --> WebApp
+    WebApp --> LoadBalancer
+    LoadBalancer --> Server
+    WebApp -.-> ApiMock
+
+    %% === FRONTEND MODULE CONNECTIONS ===
+    AppModule --> CoreModule
+    AppModule --> SharedModule
+    CoreModule --> AuthGuard
+    CoreModule --> ApiServices
+    SharedModule --> Interceptors
+
+    %% Lead Management Module Internal Flow
+    LeadComponent --> LeadService
+    LeadService --> LeadRepository
+    LeadGuard --> LeadResolver
+    LeadInterceptor --> LeadValidator
+    LeadCache --> LeadWebSocket
+    
+    %% Dealer Management Module Internal Flow
+    DealerComponent --> DealerService
+    DealerService --> DealerRepository
+    DealerGuard --> DealerResolver
+    DealerAnalytics --> DealerCache
+
+    %% Fraud Detection Module Internal Flow
+    FraudComponent --> FraudService
+    FraudService --> FraudAI
+    FraudAI --> FraudAlert
+    FraudGuard --> FraudValidator
+
+    %% === BACKEND SERVICE CONNECTIONS ===
+    Server --> AuthService
+    Server --> LeadService
+    Server --> DealerService
+    Server --> ApiProxy
+    Server --> MonitoringService
+    Server --> ValidationService
+    Server --> CacheService
+    Server --> QueueService
+    Server --> NotificationService
+
+    %% Business Logic Layer Connections
+    LeadService --> LeadBusinessLogic
+    DealerService --> DealerBusinessLogic
+    LeadBusinessLogic --> FraudDetectionLogic
+    DealerBusinessLogic --> MismatchDetectionLogic
+    RetentionLogic --> AnalyticsLogic
+
+    %% Data Access Layer Connections
+    LeadBusinessLogic --> LeadRepository
+    DealerBusinessLogic --> DealerRepository
+    FraudDetectionLogic --> AuditRepository
+    AnalyticsLogic --> AnalyticsRepository
+    CacheService --> CacheRepository
+
+    %% === DATABASE CONNECTIONS ===
+    LeadRepository --> PostgresMain
+    DealerRepository --> PostgresMain
+    UserRepository --> PostgresMain
+    AuditRepository --> PostgresMain
+    AnalyticsRepository --> PostgresAnalytics
+    CacheRepository --> RedisCache
+    
+    %% Search and Document Storage
+    Server --> ElasticSearch
+    FileUploadService --> S3Storage
+    Logger --> ElasticSearch
+    ErProcessor --> MongoDB
+
+    %% === EXTERNAL API INTEGRATIONS ===
+    AuthService --> SSOProvider
+    MobileDeAPI --> MobileDeExternal
+    CRMService --> SalesforceAPI
+    PaymentService --> StripeAPI
+    SMSService --> TwilioAPI
+    GeoService --> GoogleMapsAPI
+    EmailService --> SendGridAPI
+    NotificationService --> SlackAPI
+
+    %% === MESSAGE QUEUE & EVENT STREAMING ===
+    BatchProcess --> RabbitMQ
+    QueueService --> RabbitMQ
+    NotificationService --> Kafka
+    AnalyticsLogic --> Kafka
+    FraudDetectionLogic --> Redis_Queue
+    MismatchDetectionLogic --> Redis_Queue
+
+    %% === MONITORING & OBSERVABILITY ===
+    MonitoringService --> Prometheus
+    Logger --> Kibana
+    Server --> Jaeger
+    Server --> Sentry
+    MonitoringService --> DataDog
+    Prometheus --> Grafana
+    ElasticSearch --> Kibana
+
+    %% === INFRASTRUCTURE & DEVOPS ===
+    Server --> Docker
+    Docker --> Kubernetes
+    Docker --> Jenkins
+    Jenkins --> QuayRegistry
+    Kubernetes --> LoadBalancer
+    LoadBalancer --> CloudFront
+    Terraform --> Kubernetes
+    Ansible --> Kubernetes
+
+    %% === CROSS-MODULE COMMUNICATION ===
+    LeadService <-.->|Lead Assignment| DealerService
+    FraudDetectionLogic <-.->|Risk Alerts| NotificationService
+    MismatchDetectionLogic <-.->|Data Quality| ValidationService
+    RetentionLogic <-.->|Campaign Data| CRMService
+    AnalyticsLogic <-.->|Metrics Collection| MonitoringService
+    
+    %% === REAL-TIME DATA FLOWS ===
+    Kafka -.->|Event Streaming| LeadWebSocket
+    RabbitMQ -.->|Async Processing| BatchProcess
+    Redis_Queue -.->|Background Jobs| QueueService
+    
+    %% === SECURITY & COMPLIANCE ===
+    AuthGuard --> SecurityService
+    SecurityService --> RateLimitService
+    AuditRepository --> ElasticSearch
+    SecurityService --> SSOProvider
+
+    %% === DEVELOPMENT & TESTING ===
+    ApiMock -.-> WebApp
+    Jenkins --> Docker
+    QuayRegistry --> Kubernetes
+
+    %% === STYLING ===
+    classDef frontend fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef backend fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef database fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    classDef external fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef infra fill:#f5f5f5,stroke:#424242,stroke-width:2px
+    classDef monitoring fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef messaging fill:#e0f2f1,stroke:#004d40,stroke-width:2px
+    classDef dev fill:#fff8e1,stroke:#ff8f00,stroke-width:2px
+
+    %% Frontend Components
+    class WebApp,AppModule,CoreModule,SharedModule,AuthGuard,ApiServices,Interceptors frontend
+    class LeadComponent,LeadService,LeadGuard,LeadResolver,LeadInterceptor,LeadValidator,LeadPipe,LeadDirective,LeadModel,LeadRepository,LeadCache,LeadWebSocket frontend
+    class DealerComponent,DealerService,DealerGuard,DealerResolver,DealerInterceptor,DealerValidator,DealerPipe,DealerDirective,DealerModel,DealerRepository,DealerCache,DealerAnalytics frontend
+    class MismatchComponent,MismatchService,MismatchGuard,MismatchResolver,MismatchInterceptor,MismatchValidator,MismatchPipe,MismatchDirective,MismatchModel,MismatchRepository,MismatchML,MismatchQueue frontend
+    class FraudComponent,FraudService,FraudGuard,FraudResolver,FraudInterceptor,FraudValidator,FraudPipe,FraudDirective,FraudModel,FraudRepository,FraudAI,FraudAlert frontend
+    class RetentionComponent,RetentionService,RetentionGuard,RetentionResolver,RetentionInterceptor,RetentionValidator,RetentionPipe,RetentionDirective,RetentionModel,RetentionRepository,RetentionEngine,RetentionCRM frontend
+    class SellerComponent,SellerService,SellerGuard,SellerResolver,SellerInterceptor,SellerValidator,SellerPipe,SellerDirective,SellerModel,SellerRepository,SellerPerformance,SellerCommission frontend
+    class TrackingComponent,TrackingService,TrackingGuard,TrackingResolver,TrackingInterceptor,TrackingValidator,TrackingPipe,TrackingDirective,TrackingModel,TrackingRepository,TrackingEngine,TrackingBI frontend
+    class ErComponent,ErService,ErGuard,ErResolver,ErInterceptor,ErValidator,ErPipe,ErDirective,ErModel,ErRepository,ErProcessor,ErScheduler frontend
+
+    %% Backend Services
+    class Server,AuthService,LeadService,DealerService,BatchProcess,ApiProxy,MonitoringService,ValidationService,CacheService,QueueService,NotificationService backend
+    class LeadRepository,DealerRepository,UserRepository,AuditRepository,AnalyticsRepository,CacheRepository backend
+    class LeadBusinessLogic,DealerBusinessLogic,FraudDetectionLogic,MismatchDetectionLogic,RetentionLogic,AnalyticsLogic backend
+    class MobileDeAPI,EmailService,SMSService,CRMService,PaymentService,GeoService backend
+    class Logger,EnvConfig,StaticServing,PhoneFormatter,Zip2City,FileUploadService,SecurityService,RateLimitService backend
+
+    %% Database & Storage
+    class PostgresMain,PostgresAnalytics,RedisCache,ElasticSearch,MongoDB,S3Storage database
+
+    %% External Services
+    class SSOProvider,MobileDeExternal,SalesforceAPI,StripeAPI,TwilioAPI,GoogleMapsAPI,SendGridAPI,SlackAPI external
+
+    %% Infrastructure & DevOps
+    class Kubernetes,Docker,Jenkins,QuayRegistry,Terraform,Ansible,LoadBalancer,CloudFront infra
+
+    %% Monitoring & Observability
+    class Grafana,Kibana,Prometheus,Jaeger,Sentry,DataDog monitoring
+
+    %% Message Queue & Event Streaming
+    class RabbitMQ,Kafka,Redis_Queue messaging
+
+    %% Development Tools
+    class ApiMock dev
