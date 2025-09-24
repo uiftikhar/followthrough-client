@@ -1,0 +1,225 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36" version="28.2.3">
+  <diagram name="Selltune Lead Management Architecture" id="selltune-architecture">
+    <mxGraphModel dx="1604" dy="1501" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="Selltune Lead Management System Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Arial;fontSize=16;fontStyle=1;fontColor=#2c3e50;" parent="1" vertex="1">
+          <mxGeometry x="350" y="10" width="500" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="user-entry-container" value="👤 User Entry Points" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f0fe;strokeColor=#1a73e8;strokeWidth=2;fontFamily=Google Sans;fontSize=14;fontStyle=1;fontColor=#1a73e8;verticalAlign=top;spacingTop=20;" parent="1" vertex="1">
+          <mxGeometry x="50" y="80" width="320" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="user" value="👤 Enterprise Users&lt;br&gt;40,000+ Dealerships&lt;br&gt;Area Managers &amp;amp; Staff" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1a73e8;strokeWidth=1;fontFamily=Google Sans;fontSize=12;fontColor=#1a73e8;" parent="1" vertex="1">
+          <mxGeometry x="70" y="120" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="web-browser" value="🌐 Web Browser&lt;br&gt;Chrome, Safari, Edge" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1a73e8;strokeWidth=1;fontFamily=Google Sans;fontSize=12;fontColor=#1a73e8;" parent="1" vertex="1">
+          <mxGeometry x="220" y="120" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mobile-device" value="📱 Mobile Device&lt;br&gt;iOS &amp;amp; Android Apps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#1a73e8;strokeWidth=1;fontFamily=Google Sans;fontSize=12;fontColor=#1a73e8;" parent="1" vertex="1">
+          <mxGeometry x="145" y="200" width="130" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="frontend-container" value="💻 Frontend Applications" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f4ea;strokeColor=#34a853;strokeWidth=2;fontFamily=Google Sans;fontSize=14;fontStyle=1;fontColor=#137333;verticalAlign=top;spacingTop=20;" parent="1" vertex="1">
+          <mxGeometry x="420" y="80" width="360" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="web-app" value="🅰️ Angular 16 Web App&lt;br&gt;• Lead Management Dashboard&lt;br&gt;• Dealer Portal Interface&lt;br&gt;• Real-time Analytics&lt;br&gt;• Fraud Detection UI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#34a853;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#137333;" parent="1" vertex="1">
+          <mxGeometry x="440" y="120" width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="mobile-app" value="📱 Mobile Application&lt;br&gt;• Field Sales Tools&lt;br&gt;• Lead Capture&lt;br&gt;• Territory Management&lt;br&gt;• Offline Capabilities" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#34a853;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#137333;" parent="1" vertex="1">
+          <mxGeometry x="620" y="120" width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-container" value="⚙️ Backend Services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef7e0;strokeColor=#fbbc04;strokeWidth=2;fontFamily=Google Sans;fontSize=14;fontStyle=1;fontColor=#b06000;verticalAlign=top;spacingTop=20;" parent="1" vertex="1">
+          <mxGeometry x="820" y="80" width="720" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="api-gateway" value="🚪 API Gateway&lt;br&gt;• Request Routing&lt;br&gt;• Authentication&lt;br&gt;• Rate Limiting&lt;br&gt;• Load Balancing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fbbc04;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#b06000;" parent="1" vertex="1">
+          <mxGeometry x="840" y="120" width="140" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="lead-api" value="📋 Lead Management API&lt;br&gt;• CRUD Operations&lt;br&gt;• Lead Qualification&lt;br&gt;• Status Tracking&lt;br&gt;• Batch Processing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fbbc04;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#b06000;" parent="1" vertex="1">
+          <mxGeometry x="1000" y="120" width="140" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="dealer-api" value="🏢 Dealer Management API&lt;br&gt;• Dealer Profiles&lt;br&gt;• Territory Assignment&lt;br&gt;• Performance Analytics&lt;br&gt;• Commission Tracking" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fbbc04;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#b06000;" parent="1" vertex="1">
+          <mxGeometry x="1160" y="120" width="140" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="fraud-api" value="🛡️ Fraud Detection API&lt;br&gt;• AI Risk Assessment&lt;br&gt;• Pattern Recognition&lt;br&gt;• Real-time Alerts&lt;br&gt;• ML Model Inference" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fbbc04;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#b06000;" parent="1" vertex="1">
+          <mxGeometry x="1320" y="120" width="140" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="analytics-api" value="📊 Analytics &amp; Reporting&lt;br&gt;• Business Intelligence&lt;br&gt;• KPI Dashboards&lt;br&gt;• Export Services&lt;br&gt;• Data Aggregation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#fbbc04;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#b06000;" parent="1" vertex="1">
+          <mxGeometry x="1480" y="120" width="140" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="data-container" value="💾 Data &amp; Analytics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e8ff;strokeColor=#9334e6;strokeWidth=2;fontFamily=Google Sans;fontSize=14;fontStyle=1;fontColor=#6b21a8;verticalAlign=top;spacingTop=20;" parent="1" vertex="1">
+          <mxGeometry x="50" y="300" width="730" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="postgres-main" value="🐘 PostgreSQL&lt;br&gt;Primary Database&lt;br&gt;Lead &amp;amp; Dealer Data&lt;br&gt;ACID Compliance" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffffff;strokeColor=#9334e6;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#6b21a8;" parent="1" vertex="1">
+          <mxGeometry x="80" y="340" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="redis-cache" value="⚡ Redis Cluster&lt;br&gt;Session Cache&lt;br&gt;Real-time Data&lt;br&gt;Sub-second Response" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffffff;strokeColor=#9334e6;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#6b21a8;" parent="1" vertex="1">
+          <mxGeometry x="220" y="340" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="elasticsearch" value="🔍 Elasticsearch&lt;br&gt;Search Engine&lt;br&gt;Log Aggregation&lt;br&gt;Full-text Search" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffffff;strokeColor=#9334e6;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#6b21a8;" parent="1" vertex="1">
+          <mxGeometry x="360" y="340" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s3-storage" value="☁️ AWS S3&lt;br&gt;Object Storage&lt;br&gt;Document Archive&lt;br&gt;Export Files" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffffff;strokeColor=#9334e6;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#6b21a8;" parent="1" vertex="1">
+          <mxGeometry x="500" y="340" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="data-warehouse" value="📈 Data Warehouse&lt;br&gt;Historical Analytics&lt;br&gt;Business Intelligence&lt;br&gt;Reporting Engine" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9334e6;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#6b21a8;" parent="1" vertex="1">
+          <mxGeometry x="80" y="440" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ml-platform" value="🤖 ML Platform&lt;br&gt;Fraud Detection Models&lt;br&gt;Lead Scoring&lt;br&gt;Predictive Analytics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9334e6;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#6b21a8;" parent="1" vertex="1">
+          <mxGeometry x="240" y="440" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="integrations-container" value="🔗 External Integrations" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce8e6;strokeColor=#ea4335;strokeWidth=2;fontFamily=Google Sans;fontSize=14;fontStyle=1;fontColor=#c5221f;verticalAlign=top;spacingTop=20;" parent="1" vertex="1">
+          <mxGeometry x="820" y="300" width="720" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="adevinta-sso" value="🔐 Adevinta SSO&lt;br&gt;Enterprise Auth&lt;br&gt;SAML/OAuth2&lt;br&gt;Multi-factor Auth" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ea4335;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#c5221f;" parent="1" vertex="1">
+          <mxGeometry x="840" y="340" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="mobile-de-api" value="🚗 Mobile.de API&lt;br&gt;Vehicle Inventory&lt;br&gt;Real-time Data&lt;br&gt;Market Insights" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ea4335;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#c5221f;" parent="1" vertex="1">
+          <mxGeometry x="980" y="340" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="salesforce-api" value="☁️ Salesforce CRM&lt;br&gt;Customer Management&lt;br&gt;Sales Pipeline&lt;br&gt;Lead Nurturing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ea4335;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#c5221f;" parent="1" vertex="1">
+          <mxGeometry x="1120" y="340" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="stripe-api" value="💳 Stripe Payments&lt;br&gt;Payment Processing&lt;br&gt;Subscription Billing&lt;br&gt;Financial Reports" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ea4335;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#c5221f;" parent="1" vertex="1">
+          <mxGeometry x="1260" y="340" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="twilio-api" value="📞 Twilio&lt;br&gt;SMS &amp;amp; Voice&lt;br&gt;Notifications&lt;br&gt;Two-way Messaging" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ea4335;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#c5221f;" parent="1" vertex="1">
+          <mxGeometry x="840" y="440" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="sendgrid-api" value="✉️ SendGrid&lt;br&gt;Email Campaigns&lt;br&gt;Transactional Emails&lt;br&gt;Delivery Analytics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ea4335;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#c5221f;" parent="1" vertex="1">
+          <mxGeometry x="980" y="440" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="slack-api" value="💬 Slack&lt;br&gt;Team Notifications&lt;br&gt;Alert Integration&lt;br&gt;Workflow Automation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ea4335;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#c5221f;" parent="1" vertex="1">
+          <mxGeometry x="1120" y="440" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="google-maps-api" value="🗺️ Google Maps&lt;br&gt;Geolocation&lt;br&gt;Territory Mapping&lt;br&gt;Route Optimization" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ea4335;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#c5221f;" parent="1" vertex="1">
+          <mxGeometry x="1400" y="340" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="infrastructure-container" value="🏗️ Infrastructure &amp; Platform" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f3f4;strokeColor=#5f6368;strokeWidth=2;fontFamily=Google Sans;fontSize=14;fontStyle=1;fontColor=#3c4043;verticalAlign=top;spacingTop=20;" parent="1" vertex="1">
+          <mxGeometry x="50" y="540" width="1490" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="kubernetes" value="☸️ Kubernetes&lt;br&gt;Container Orchestration&lt;br&gt;Auto-scaling&lt;br&gt;Service Mesh" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#5f6368;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#3c4043;" parent="1" vertex="1">
+          <mxGeometry x="80" y="580" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="docker" value="🐳 Docker&lt;br&gt;Containerization&lt;br&gt;Microservices&lt;br&gt;Deployment Units" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#5f6368;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#3c4043;" parent="1" vertex="1">
+          <mxGeometry x="230" y="580" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="jenkins" value="🔄 Jenkins&lt;br&gt;Continuous Integration&lt;br&gt;Automated Testing&lt;br&gt;Deployment Pipeline" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#5f6368;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#3c4043;" parent="1" vertex="1">
+          <mxGeometry x="380" y="580" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="quay-registry" value="📦 Quay Registry&lt;br&gt;Container Images&lt;br&gt;Security Scanning&lt;br&gt;Version Management" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#5f6368;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#3c4043;" parent="1" vertex="1">
+          <mxGeometry x="530" y="580" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="grafana" value="📊 Grafana&lt;br&gt;Metrics Dashboards&lt;br&gt;Business KPIs&lt;br&gt;Real-time Monitoring" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#5f6368;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#3c4043;" parent="1" vertex="1">
+          <mxGeometry x="680" y="580" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="prometheus" value="📈 Prometheus&lt;br&gt;Metrics Collection&lt;br&gt;Alerting Rules&lt;br&gt;Time Series DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#5f6368;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#3c4043;" parent="1" vertex="1">
+          <mxGeometry x="830" y="580" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="elastic-stack" value="🔍 Elastic Stack&lt;br&gt;Log Management&lt;br&gt;APM Monitoring&lt;br&gt;Error Tracking" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#5f6368;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#3c4043;" parent="1" vertex="1">
+          <mxGeometry x="980" y="580" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="aws-cloud" value="☁️ AWS Cloud&lt;br&gt;Compute &amp;amp; Storage&lt;br&gt;Managed Services&lt;br&gt;Global Infrastructure" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#5f6368;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#3c4043;" parent="1" vertex="1">
+          <mxGeometry x="1130" y="580" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="cloudfront" value="🌐 CloudFront CDN&lt;br&gt;Global Distribution&lt;br&gt;Edge Caching&lt;br&gt;Performance Optimization" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#5f6368;strokeWidth=1;fontFamily=Google Sans;fontSize=11;fontColor=#3c4043;" parent="1" vertex="1">
+          <mxGeometry x="1280" y="580" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="user-to-web" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#1a73e8;endArrow=classic;endSize=8;" parent="1" source="web-browser" target="web-app" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mobile-to-app" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#1a73e8;endArrow=classic;endSize=8;" parent="1" source="mobile-device" target="mobile-app" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="web-to-api" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#34a853;endArrow=classic;endSize=8;" parent="1" source="web-app" target="api-gateway" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mobile-to-api" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#34a853;endArrow=classic;endSize=8;" parent="1" source="mobile-app" target="api-gateway" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway-to-lead" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#fbbc04;endArrow=classic;endSize=6;" parent="1" source="api-gateway" target="lead-api" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway-to-dealer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#fbbc04;endArrow=classic;endSize=6;" parent="1" source="api-gateway" target="dealer-api" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway-to-fraud" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#fbbc04;endArrow=classic;endSize=6;" parent="1" source="api-gateway" target="fraud-api" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway-to-analytics" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#fbbc04;endArrow=classic;endSize=6;" parent="1" source="api-gateway" target="analytics-api" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lead-to-postgres" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#9334e6;endArrow=classic;endSize=6;" parent="1" source="lead-api" target="postgres-main" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1070" y="280" />
+              <mxPoint x="140" y="280" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dealer-to-postgres" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#9334e6;endArrow=classic;endSize=6;" parent="1" source="dealer-api" target="postgres-main" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1230" y="290" />
+              <mxPoint x="140" y="290" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fraud-to-ml" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#9334e6;endArrow=classic;endSize=6;" parent="1" source="fraud-api" target="ml-platform" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1390" y="270" />
+              <mxPoint x="305" y="270" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="analytics-to-warehouse" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#9334e6;endArrow=classic;endSize=6;" parent="1" source="analytics-api" target="data-warehouse" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1550" y="280" />
+              <mxPoint x="145" y="280" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gateway-to-sso" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#ea4335;endArrow=classic;endSize=6;" parent="1" source="api-gateway" target="adevinta-sso" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lead-to-mobile-de" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#ea4335;endArrow=classic;endSize=6;dashed=1;" parent="1" source="lead-api" target="mobile-de-api" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dealer-to-salesforce" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#ea4335;endArrow=classic;endSize=6;dashed=1;" parent="1" source="dealer-api" target="salesforce-api" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="analytics-to-stripe" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#ea4335;endArrow=classic;endSize=6;dashed=1;" parent="1" source="analytics-api" target="stripe-api" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-to-docker" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#5f6368;endArrow=classic;endSize=6;" parent="1" source="api-gateway" target="docker" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="910" y="520" />
+              <mxPoint x="295" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="docker-to-k8s" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#5f6368;endArrow=classic;endSize=6;" parent="1" source="docker" target="kubernetes" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="k8s-to-aws" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#5f6368;endArrow=classic;endSize=6;" parent="1" source="kubernetes" target="aws-cloud" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-to-prometheus" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#5f6368;endArrow=classic;endSize=6;dashed=1;" parent="1" source="lead-api" target="prometheus" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1070" y="530" />
+              <mxPoint x="895" y="530" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="prometheus-to-grafana" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#5f6368;endArrow=classic;endSize=6;" parent="1" source="prometheus" target="grafana" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

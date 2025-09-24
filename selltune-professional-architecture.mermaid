@@ -1,0 +1,164 @@
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#ffffff','primaryTextColor':'#1a73e8','primaryBorderColor':'#dadce0','lineColor':'#5f6368','secondaryColor':'#f8f9fa','tertiaryColor':'#e8eaed','background':'#ffffff','mainBkg':'#ffffff','secondBkg':'#f8f9fa','tertiaryBkg':'#e8eaed'}}}%%
+
+flowchart TB
+    %% === USER ENTRY LAYER ===
+    subgraph USER_ENTRY["👤 User Entry Points"]
+        User[👤 Enterprise Users<br/>40,000+ Dealerships<br/>Area Managers & Staff]
+        WebBrowser[🌐 Web Browser<br/>Chrome, Safari, Edge]
+        MobileDevice[📱 Mobile Device<br/>iOS & Android Apps]
+    end
+
+    %% === FRONTEND LAYER ===
+    subgraph FRONTEND["💻 Frontend Applications"]
+        WebApp[🅰️ Angular 16 Web App<br/>• Lead Management Dashboard<br/>• Dealer Portal Interface<br/>• Real-time Analytics<br/>• Fraud Detection UI]
+        MobileApp[📱 Mobile Application<br/>• Field Sales Tools<br/>• Lead Capture<br/>• Territory Management<br/>• Offline Capabilities]
+    end
+
+    %% === BACKEND LAYER ===
+    subgraph BACKEND["⚙️ Backend Services"]
+        APIGateway[🚪 API Gateway<br/>• Request Routing<br/>• Authentication<br/>• Rate Limiting<br/>• Load Balancing]
+        
+        subgraph CORE_SERVICES["Core Business Services"]
+            LeadAPI[📋 Lead Management API<br/>• CRUD Operations<br/>• Lead Qualification<br/>• Status Tracking<br/>• Batch Processing]
+            DealerAPI[🏢 Dealer Management API<br/>• Dealer Profiles<br/>• Territory Assignment<br/>• Performance Analytics<br/>• Commission Tracking]
+            FraudAPI[🛡️ Fraud Detection API<br/>• AI Risk Assessment<br/>• Pattern Recognition<br/>• Real-time Alerts<br/>• ML Model Inference]
+            AnalyticsAPI[📊 Analytics & Reporting<br/>• Business Intelligence<br/>• KPI Dashboards<br/>• Export Services<br/>• Data Aggregation]
+        end
+    end
+
+    %% === DATA & ANALYTICS LAYER ===
+    subgraph DATA_ANALYTICS["💾 Data & Analytics"]
+        subgraph DATABASES["Primary Databases"]
+            PostgresMain[(🐘 PostgreSQL<br/>Primary Database<br/>Lead & Dealer Data<br/>ACID Compliance)]
+            RedisCache[(⚡ Redis Cluster<br/>Session Cache<br/>Real-time Data<br/>Sub-second Response)]
+        end
+        
+        subgraph SEARCH_STORAGE["Search & Storage"]
+            Elasticsearch[(🔍 Elasticsearch<br/>Search Engine<br/>Log Aggregation<br/>Full-text Search)]
+            S3Storage[(☁️ AWS S3<br/>Object Storage<br/>Document Archive<br/>Export Files)]
+        end
+        
+        subgraph ANALYTICS_PLATFORM["Analytics Platform"]
+            DataWarehouse[(📈 Data Warehouse<br/>Historical Analytics<br/>Business Intelligence<br/>Reporting Engine)]
+            MLPlatform[🤖 ML Platform<br/>Fraud Detection Models<br/>Lead Scoring<br/>Predictive Analytics]
+        end
+    end
+
+    %% === INTEGRATIONS LAYER ===
+    subgraph INTEGRATIONS["🔗 External Integrations"]
+        subgraph IDENTITY_AUTH["Identity & Authentication"]
+            AdevintaSSO[🔐 Adevinta SSO<br/>Enterprise Auth<br/>SAML/OAuth2<br/>Multi-factor Auth]
+        end
+        
+        subgraph BUSINESS_APIS["Business APIs"]
+            MobileDeAPI[🚗 Mobile.de API<br/>Vehicle Inventory<br/>Real-time Data<br/>Market Insights]
+            SalesforceAPI[☁️ Salesforce CRM<br/>Customer Management<br/>Sales Pipeline<br/>Lead Nurturing]
+            StripeAPI[💳 Stripe Payments<br/>Payment Processing<br/>Subscription Billing<br/>Financial Reports]
+        end
+        
+        subgraph COMMUNICATION["Communication Services"]
+            TwilioAPI[📞 Twilio<br/>SMS & Voice<br/>Notifications<br/>Two-way Messaging]
+            SendGridAPI[✉️ SendGrid<br/>Email Campaigns<br/>Transactional Emails<br/>Delivery Analytics]
+            SlackAPI[💬 Slack<br/>Team Notifications<br/>Alert Integration<br/>Workflow Automation]
+        end
+        
+        subgraph LOCATION_SERVICES["Location Services"]
+            GoogleMapsAPI[🗺️ Google Maps<br/>Geolocation<br/>Territory Mapping<br/>Route Optimization]
+        end
+    end
+
+    %% === INFRASTRUCTURE LAYER ===
+    subgraph INFRASTRUCTURE["🏗️ Infrastructure & Platform"]
+        subgraph CONTAINER_PLATFORM["Container Platform"]
+            Kubernetes[☸️ Kubernetes<br/>Container Orchestration<br/>Auto-scaling<br/>Service Mesh]
+            Docker[🐳 Docker<br/>Containerization<br/>Microservices<br/>Deployment Units]
+        end
+        
+        subgraph CICD_PLATFORM["CI/CD Platform"]
+            Jenkins[🔄 Jenkins<br/>Continuous Integration<br/>Automated Testing<br/>Deployment Pipeline]
+            QuayRegistry[📦 Quay Registry<br/>Container Images<br/>Security Scanning<br/>Version Management]
+        end
+        
+        subgraph MONITORING_PLATFORM["Monitoring & Observability"]
+            Grafana[📊 Grafana<br/>Metrics Dashboards<br/>Business KPIs<br/>Real-time Monitoring]
+            Prometheus[📈 Prometheus<br/>Metrics Collection<br/>Alerting Rules<br/>Time Series DB]
+            ElasticStack[🔍 Elastic Stack<br/>Log Management<br/>APM Monitoring<br/>Error Tracking]
+        end
+        
+        subgraph CLOUD_PLATFORM["Cloud Platform"]
+            AWSCloud[☁️ AWS Cloud<br/>Compute & Storage<br/>Managed Services<br/>Global Infrastructure]
+            CloudFront[🌐 CloudFront CDN<br/>Global Distribution<br/>Edge Caching<br/>Performance Optimization]
+        end
+    end
+
+    %% === PRIMARY USER FLOWS ===
+    User --> WebBrowser
+    User --> MobileDevice
+    WebBrowser --> WebApp
+    MobileDevice --> MobileApp
+
+    %% === FRONTEND TO BACKEND ===
+    WebApp --> APIGateway
+    MobileApp --> APIGateway
+
+    %% === API GATEWAY ROUTING ===
+    APIGateway --> LeadAPI
+    APIGateway --> DealerAPI
+    APIGateway --> FraudAPI
+    APIGateway --> AnalyticsAPI
+
+    %% === BACKEND TO DATA ===
+    LeadAPI --> PostgresMain
+    LeadAPI --> RedisCache
+    DealerAPI --> PostgresMain
+    DealerAPI --> RedisCache
+    FraudAPI --> MLPlatform
+    AnalyticsAPI --> DataWarehouse
+
+    %% === SEARCH & STORAGE ===
+    CORE_SERVICES --> Elasticsearch
+    CORE_SERVICES --> S3Storage
+
+    %% === AUTHENTICATION FLOW ===
+    APIGateway --> AdevintaSSO
+
+    %% === EXTERNAL API INTEGRATIONS ===
+    LeadAPI --> MobileDeAPI
+    DealerAPI --> SalesforceAPI
+    AnalyticsAPI --> StripeAPI
+    CORE_SERVICES --> TwilioAPI
+    CORE_SERVICES --> SendGridAPI
+    CORE_SERVICES --> SlackAPI
+    DealerAPI --> GoogleMapsAPI
+
+    %% === INFRASTRUCTURE CONNECTIONS ===
+    BACKEND --> Docker
+    Docker --> Kubernetes
+    Kubernetes --> AWSCloud
+    CORE_SERVICES --> Prometheus
+    Prometheus --> Grafana
+    CORE_SERVICES --> ElasticStack
+    Jenkins --> QuayRegistry
+    WebApp --> CloudFront
+
+    %% === MONITORING & OBSERVABILITY ===
+    PostgresMain -.-> Prometheus
+    RedisCache -.-> Prometheus
+    Kubernetes -.-> ElasticStack
+    APIGateway -.-> Grafana
+
+    %% === STYLING - GOOGLE ARCHITECTURE STYLE ===
+    classDef userEntry fill:#e8f0fe,stroke:#1a73e8,stroke-width:2px,color:#1a73e8
+    classDef frontend fill:#e6f4ea,stroke:#34a853,stroke-width:2px,color:#137333
+    classDef backend fill:#fef7e0,stroke:#fbbc04,stroke-width:2px,color:#b06000
+    classDef data fill:#f3e8ff,stroke:#9334e6,stroke-width:2px,color:#6b21a8
+    classDef integrations fill:#fce8e6,stroke:#ea4335,stroke-width:2px,color:#c5221f
+    classDef infrastructure fill:#f1f3f4,stroke:#5f6368,stroke-width:2px,color:#3c4043
+
+    %% === APPLY STYLES ===
+    class USER_ENTRY,User,WebBrowser,MobileDevice userEntry
+    class FRONTEND,WebApp,MobileApp frontend
+    class BACKEND,APIGateway,CORE_SERVICES,LeadAPI,DealerAPI,FraudAPI,AnalyticsAPI backend
+    class DATA_ANALYTICS,DATABASES,SEARCH_STORAGE,ANALYTICS_PLATFORM,PostgresMain,RedisCache,Elasticsearch,S3Storage,DataWarehouse,MLPlatform data
+    class INTEGRATIONS,IDENTITY_AUTH,BUSINESS_APIS,COMMUNICATION,LOCATION_SERVICES,AdevintaSSO,MobileDeAPI,SalesforceAPI,StripeAPI,TwilioAPI,SendGridAPI,SlackAPI,GoogleMapsAPI integrations
+    class INFRASTRUCTURE,CONTAINER_PLATFORM,CICD_PLATFORM,MONITORING_PLATFORM,CLOUD_PLATFORM,Kubernetes,Docker,Jenkins,QuayRegistry,Grafana,Prometheus,ElasticStack,AWSCloud,CloudFront infrastructure
